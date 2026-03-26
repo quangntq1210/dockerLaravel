@@ -1,7 +1,6 @@
 <?php
-use App\Jobs\NewJob;
-use App\Models\User;
-use Illuminate\Support\Facades\DB;
+
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,14 +18,14 @@ Route::get('/', function () {
     return view('welcome');
 
 });
-Route::get('/test-db', function () {
-    return DB::table('users')->get();
-});
 
-Route::get('/send-mail', function () {
-    $users = User::get();
-    foreach ($users as $user) {
-        NewJob::dispatch($user->email, $user->name);
-    }
-    return 'Đã đưa ' . count($users) . ' job vào Redis queue!';
-});
+//Route::middleware('auth')->group(function () {
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::get('/{id}', [NotificationController::class, 'show'])->name('notifications.show');
+        Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::put('/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+        Route::put('/read-all', [NotificationController::class, 'markAllAsRead']);
+        Route::delete('/{id}', [NotificationController::class, 'destroy']);
+    });
+//});

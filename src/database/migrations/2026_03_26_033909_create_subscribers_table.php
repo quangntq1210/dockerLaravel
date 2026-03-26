@@ -13,14 +13,14 @@ class CreateSubscribersTable extends Migration
      */
     public function up()
     {
-       Schema::create('subscribers', function (Blueprint $table) {
-    $table->id();
-    $table->string('name');
-    $table->string('email')->unique();
-    $table->unsignedBigInteger('user_id')->nullable()->index(); // Map sang bảng users nếu có
-    $table->softDeletes();
-    $table->timestamps();
-});
+        Schema::create('subscribers', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->unsignedBigInteger('user_id')->nullable()->index(); // Map sang bảng users nếu có
+            $table->softDeletes();
+            $table->timestamps();
+        });
     }
 
     /**

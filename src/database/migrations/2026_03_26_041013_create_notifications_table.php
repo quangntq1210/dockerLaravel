@@ -14,14 +14,14 @@ class CreateNotificationsTable extends Migration
     public function up()
     {
         Schema::create('notifications', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('user_id')->constrained()->onDelete('cascade');
-    $table->foreignId('campaign_id')->nullable()->constrained()->onDelete('set null');
-    $table->string('title');
-    $table->text('message');
-    $table->timestamp('read_at')->nullable()->index();
-    $table->timestamps();
-});
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('campaign_id')->nullable()->constrained()->onDelete('set null');
+            $table->string('title');
+            $table->text('message');
+            $table->timestamp('read_at')->nullable()->index();
+            $table->timestamps();
+        });
     }
 
     /**

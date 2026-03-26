@@ -14,16 +14,14 @@ class CreateCampaignRecipientsTable extends Migration
     public function up()
     {
         Schema::create('campaign_recipients', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('campaign_id')->constrained()->onDelete('cascade');
-    $table->foreignId('subscriber_id')->constrained()->onDelete('cascade');
-    $table->string('status')->default('pending')->index(); 
-    $table->dateTime('sent_at')->nullable();
-    $table->timestamps();
-    
-    // Đảm bảo 1 subscriber không nhận trùng 1 campaign 2 lần
-    $table->unique(['campaign_id', 'subscriber_id']); 
-});
+            $table->id();
+            $table->foreignId('campaign_id')->constrained()->onDelete('cascade');
+            $table->foreignId('subscriber_id')->constrained()->onDelete('cascade');
+            $table->string('status')->default('pending')->index();
+            $table->dateTime('sent_at')->nullable();
+            $table->timestamps();
+            $table->unique(['campaign_id', 'subscriber_id']);
+        });
     }
 
     /**
