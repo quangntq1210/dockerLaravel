@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Campaign;
+use App\Models\Subscriber;
 
 class CampaignRecipientFactory extends Factory
 {
@@ -14,7 +16,10 @@ class CampaignRecipientFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'campaign_id'   => Campaign::factory(),
+            'subscriber_id' => Subscriber::factory(),
+            'status'        => $this->faker->randomElement(['pending', 'sent', 'failed']),
+            'sent_at'       => null,
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\User;
 
 class SubscriberFactory extends Factory
 {
@@ -14,7 +15,9 @@ class SubscriberFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'name' => $this->faker->name,
+            'email' => $this->faker->email,
+            'user_id' => $this->faker->boolean ? optional(User::inRandomOrder()->first())->id : null,
         ];
     }
 }

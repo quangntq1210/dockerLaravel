@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\User;
 
 class CampaignFactory extends Factory
 {
@@ -14,7 +15,11 @@ class CampaignFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'title'      => $this->faker->sentence(5),
+            'body'       => $this->faker->paragraph(3),
+            'send_at'    => $this->faker->dateTimeBetween('now', '+7 days'),
+            'status'     => $this->faker->randomElement(['draft', 'scheduled', 'processing', 'sent', 'failed']),
+            'created_by' => optional(User::where('role', 'admin')->inRandomOrder()->first())->id,
         ];
     }
 }

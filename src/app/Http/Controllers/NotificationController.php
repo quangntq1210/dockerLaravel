@@ -18,27 +18,11 @@ class NotificationController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Contracts\View\View
      */
-    public function index(Request $request): JsonResponse
+    public function index()
     {
-        //        $userId = auth()->id();
-        $userId = 1;
-        $perPage = $request->get('per_page', 20);
-        $page = $request->get('page', 1);
-        //
-        $notifications = $this->notificationRepo->getUserNotifications($userId, $perPage, $page);
-        $unreadCount = $this->notificationRepo->getUnreadCount($userId);
-        //
-        return response()->json([
-            'data' => $notifications->items(),
-            'meta' => [
-                'current_page' => $notifications->currentPage(),
-                'per_page' => $notifications->perPage(),
-                'total' => $notifications->total(),
-                'unread_count' => $unreadCount,
-            ],
-        ]);
+        return view('user.notifications');
     }
 
     /**
@@ -105,6 +89,30 @@ class NotificationController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /**
+     * List notifications
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function list(Request $request): JsonResponse
+    {
+        $userId = auth()->id();
+        $notifications = $this->notificationRepo->getUserNotifications(
+            $userId,
+            $request->get('per_page', 10),
+            $request->get('page', 1)
+        );
+        return response()->json([
+            'data' => $notifications->items(),
+            'meta' => [
+                'current_page' => $notifications->currentPage(),
+                'per_page'     => $notifications->perPage(),
+                'total'        => $notifications->total(),
+                'unread_count' => $this->notificationRepo->getUnreadCount($userId),
+            ],
+        ]);
     }
 
     public function markAsRead(Request $request)
