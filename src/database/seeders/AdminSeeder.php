@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
-class AdminUserSeeder extends Seeder
+class AdminSeeder extends Seeder
 {
     public function run()
     {
@@ -20,14 +20,6 @@ class AdminUserSeeder extends Seeder
             ]
         );
 
-        // (Tùy chọn) Tạo thêm 1 tài khoản User thường để test phân quyền
-        User::updateOrCreate(
-            ['email' => 'user@gmail.com'],
-            [
-                'name' => 'Quang User',
-                'password' => Hash::make('12345678'),
-                'role' => 'user',
-            ]
-        );
+     
     }
 }
