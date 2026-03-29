@@ -22,6 +22,18 @@ services:
     depends_on:
       - app
 
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel_worker
+    volumes:
+      - ./src:/var/www
+      - ./supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
+    depends_on:
+      - db
+    command: supervisord -n -c /etc/supervisor/conf.d/supervisord.conf
+
   db:
     image: mysql:8
     container_name: laravel_db
