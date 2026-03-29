@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Repositories\Eloquent\NotificationRepository;
+use App\Http\Controllers\ApiController;
 
-class NotificationController extends Controller
+class NotificationController extends ApiController
 {
     protected $notificationRepo;
 
@@ -88,7 +89,11 @@ class NotificationController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $notification = $this->notificationRepo->delete($id);
+        if (!$notification) {
+            return $this->error('Notification not found', 404);
+        }
+        return $this->success('Notification deleted successfully', null, null, 200);
     }
 
     /**
@@ -102,9 +107,10 @@ class NotificationController extends Controller
         $notifications = $this->notificationRepo->getUserNotifications(
             $userId,
             $request->get('per_page', 10),
-            $request->get('page', 1)
+            $request->get('page', 1),
+            $request->boolean('unread')
         );
-        return response()->json([
+        return $this->success('Notifications fetched successfully', [
             'data' => $notifications->items(),
             'meta' => [
                 'current_page' => $notifications->currentPage(),
@@ -115,18 +121,51 @@ class NotificationController extends Controller
         ]);
     }
 
-    public function markAsRead(Request $request)
+    /**
+     * Mark notification as read
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function markAsRead($id)
     {
-        //
+        $notification = $this->notificationRepo->markAsRead($id);
+        if (!$notification) {
+            return $this->error('Notification not found', 404);
+        }
+        return $this->success('Notification marked as read successfully', null, null, 200);
     }
 
+    /**
+     * Mark notification as unread
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function markAsUnread($id)
+    {
+        $notification = $this->notificationRepo->markAsUnread($id);
+        if (!$notification) {
+            return $this->error('Notification not found', 404);
+        }
+        return $this->success('Notification marked as unread successfully', null, null, 200);
+    }
+
+    /**
+     * Get unread count
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function unreadCount()
     {
-        //
+        $count = $this->notificationRepo->getUnreadCount(auth()->id());
+        return $this->success('Unread count fetched successfully', $count, null, 200);
     }
 
+    /**
+     * Mark all notifications as read
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function markAllAsRead()
     {
-        //
+        $count = $this->notificationRepo->markAllAsRead(auth()->id());
+        return $this->success('Notifications marked as read successfully', null, null, 200);
     }
 }
