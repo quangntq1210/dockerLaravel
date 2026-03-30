@@ -200,7 +200,7 @@
 
       const params = {
         page: page,
-        per_page: 8
+        per_page: 7
       };
       if (filter === 'unread') params.unread = 1;
 
@@ -215,6 +215,9 @@
               '<div class="text-center py-5 text-muted">' +
               '<i class="bi bi-bell-slash fs-2 d-block mb-2"></i>Không có thông báo nào</div>'
             );
+            $('#pagination-list').empty();
+            $('#pagination-wrap').hide();
+            updateUnreadBadge(res.data.data.unread_count);
             return;
           }
 
