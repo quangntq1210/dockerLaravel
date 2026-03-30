@@ -27,6 +27,7 @@ Route::middleware(['auth', 'role:user'])->group(function () {
         Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('api.user.notifications.unread-count');
         Route::put('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('api.user.notifications.read-all');
         Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('api.user.notifications.read');
+        Route::put('/notifications/{id}/unread', [NotificationController::class, 'markAsUnread'])->name('api.user.notifications.unread');
         Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('api.user.notifications.destroy');
     });
 });
