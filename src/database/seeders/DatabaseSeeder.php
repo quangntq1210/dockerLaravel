@@ -3,12 +3,6 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Database\Seeders\AdminUserSeeder;
-use Database\Seeders\UserSeeder;
-use Database\Seeders\SubscriberSeeder;
-use Database\Seeders\CampaignSeeder;
-use Database\Seeders\NotificationSeeder;
-use Database\Seeders\CampaignRecipientSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,12 +13,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->call([
-            UserSeeder::class,
-            SubscriberSeeder::class,
-            CampaignSeeder::class,
-            NotificationSeeder::class,
-            CampaignRecipientSeeder::class,
-        ]);
+        // User::factory(10)->create();
     }
 }
