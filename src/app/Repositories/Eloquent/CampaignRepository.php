@@ -121,4 +121,16 @@ class CampaignRepository implements CampaignRepositoryInterface
   {
     return Campaign::where('status', $status)->count();
   }
+
+  /**
+   * Claim scheduled campaign
+   * @param int $campaignId
+   * @return bool
+   */
+  public function claimScheduledCampaign(int $campaignId): bool
+  {
+    return Campaign::where('id', $campaignId)
+      ->where('status', 'scheduled')
+      ->update(['status' => 'processing']) === 1;
+  }
 }

@@ -13,12 +13,15 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class SendCampaignJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 3;
+
+    public $backoff = [10, 20, 30];
 
     public $recipient;
 
@@ -27,6 +30,14 @@ class SendCampaignJob implements ShouldQueue
         $this->recipient = $recipient;
     }
 
+    /**
+     * Handle the job.
+     *
+     * @param NotificationRepositoryInterface $notifRepo
+     * @param CampaignRecipientsRepositoryInterface $recipientRepo
+     * @param CampaignRepositoryInterface $campaignRepo
+     * @return void
+     */
     public function handle(
         NotificationRepositoryInterface $notifRepo,
         CampaignRecipientsRepositoryInterface $recipientRepo,
@@ -41,31 +52,69 @@ class SendCampaignJob implements ShouldQueue
             return;
         }
 
-        // Send email to subscriber's email address
-        Mail::to($subscriber->email)->send(new CampaignMail($campaign, $subscriber));
+        try {
+            Mail::to($subscriber->email)->send(new CampaignMail($campaign, $subscriber));
 
-        // Create notification in the system if subscriber has a user account
-        if ($subscriber->user_id) {
-            $notifRepo->create([
-                'user_id'     => $subscriber->user_id,
-                'campaign_id' => $campaign->id,
-                'title'       => $campaign->title,
-                'message'     => $campaign->body,
+            if (count(Mail::failures()) > 0) {
+                throw new \RuntimeException('SMTP reported failures: ' . implode(',', Mail::failures()));
+            }
+
+            if ($subscriber->user_id) {
+                $notifRepo->create([
+                    'user_id'     => $subscriber->user_id,
+                    'campaign_id' => $campaign->id,
+                    'title'       => $campaign->title,
+                    'message'     => $campaign->body,
+                ]);
+            }
+
+            $recipientRepo->update([
+                'status'  => 'sent',
+                'sent_at' => now(),
+            ], $recipient->id);
+
+            if (!$recipientRepo->hasPending($campaign->id)) {
+                $campaignRepo->update(['status' => 'sent'], $campaign->id);
+            }
+        } catch (\Throwable $e) {
+            Log::warning('SendCampaignJob handle failed', [
+                'campaign_id'   => $recipient->campaign_id,
+                'subscriber_id' => $recipient->subscriber_id,
+                'recipient_id'  => $recipient->id,
+                'attempt'       => $this->attempts(),
+                'error'         => $e->getMessage(),
             ]);
-        }
 
-        $recipientRepo->update([
-            'status'  => 'sent',
-            'sent_at' => now(),
-        ], $recipient->id);
-
-        if (!$recipientRepo->hasPending($campaign->id)) {
-            $campaignRepo->update(['status' => 'sent'], $campaign->id);
+            throw $e;
         }
     }
 
+    /**
+     * Handle the job failure.
+     *
+     * @param \Throwable $exception
+     * @return void
+     */
     public function failed(\Throwable $exception)
     {
-        $this->recipient->update(['status' => 'failed']);
+        $recipientRepo = app(CampaignRecipientsRepositoryInterface::class);
+        $campaignRepo = app(CampaignRepositoryInterface::class);
+        $recipient = $recipientRepo->getById($this->recipient->id);
+        if (!$recipient) {
+            return;
+        }
+
+        $recipientRepo->update(['status' => 'failed'], $recipient->id);
+        Log::error('SendCampaignJob failed', [
+            'campaign_id' => $recipient->campaign_id,
+            'subscriber_id' => $recipient->subscriber_id,
+            'recipient_id' => $recipient->id,
+            'attempt' => $this->attempts(),
+            'error' => $exception->getMessage(),
+        ]);
+
+        if (!$recipientRepo->hasPending($recipient->campaign_id)) {
+            $campaignRepo->update(['status' => 'sent'], $recipient->campaign_id);
+        }
     }
 }

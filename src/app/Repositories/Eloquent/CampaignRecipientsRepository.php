@@ -123,4 +123,16 @@ class CampaignRecipientsRepository implements CampaignRecipientsRepositoryInterf
       ->where('status', 'pending')
       ->exists();
   }
+
+  /**
+   * Claim pending recipient
+   * @param int $recipientId
+   * @return bool
+   */
+  public function claimPendingRecipient(int $recipientId): bool
+  {
+    return CampaignRecipient::where('id', $recipientId)
+      ->where('status', 'pending')
+      ->update(['status' => 'processing']) === 1;
+  }
 }
