@@ -113,4 +113,13 @@ class NotificationRepository implements NotificationRepositoryInterface
             ->orderBy('created_at', 'desc')
             ->get();
     }
+
+    /**
+     * Get total notifications
+     * @return int
+     */
+    public function getTotal()
+    {
+        return Notification::count();
+    }
 }

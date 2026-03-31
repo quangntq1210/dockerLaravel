@@ -1,24 +1,23 @@
 <?php
 
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\CampaignSchedulingController;
+use App\Http\Controllers\SubscriberController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
+Route::redirect('/', '/notifications');
 Route::get('/login', 'App\Http\Controllers\Auth\LoginController@showLoginForm')->name('login');
 Route::post('/login', 'App\Http\Controllers\Auth\LoginController@login')->name('login.post');
 Route::post('/logout', 'App\Http\Controllers\Auth\LoginController@logout')->name('logout');
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', 'App\Http\Controllers\AdminController@index')->name('admin.dashboard');
-    Route::resource('campaigns', 'App\Http\Controllers\CampaignController');
+    Route::get('/campaign-scheduling', [CampaignSchedulingController::class, 'index'])->name('admin.campaign-scheduling');
+    Route::post('/campaign-scheduling', [CampaignSchedulingController::class, 'store'])->name('admin.campaign-scheduling.store');
     Route::get('/subscribers/search', 'App\Http\Controllers\SubscriberController@search');
 });
 
 Route::middleware(['auth', 'role:user'])->group(function () {
-
     Route::get('/notifications', [NotificationController::class, 'index'])
         ->name('notifications.index');
 

@@ -48,4 +48,10 @@ interface NotificationRepositoryInterface
      * Get unread notifications
      */
     public function getUnread($userId);
+
+    /**
+     * Get total notifications
+     * @return int
+     */
+    public function getTotal();
 }

@@ -19,6 +19,16 @@ class CampaignRecipientsRepository implements CampaignRecipientsRepositoryInterf
   }
 
   /*
+  * Create new campaign recipients in bulk
+  * @param array $data
+  * @return bool
+  */
+  public function createBulk(array $data)
+  {
+    return CampaignRecipient::insert($data);
+  }
+
+  /*
   * Update campaign recipient by ID
   * @param array $data
   * @param int $id
@@ -37,6 +47,16 @@ class CampaignRecipientsRepository implements CampaignRecipientsRepositoryInterf
   public function delete($id)
   {
     return CampaignRecipient::where('id', $id)->delete();
+  }
+
+  /*
+  * Delete campaign recipients by campaign ID
+  * @param int $campaignId
+  * @return bool
+  */
+  public function deleteByCampaignId($campaignId)
+  {
+    return CampaignRecipient::where('campaign_id', $campaignId)->delete();
   }
 
   /*

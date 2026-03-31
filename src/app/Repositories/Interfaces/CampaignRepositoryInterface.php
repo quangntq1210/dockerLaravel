@@ -43,4 +43,22 @@ interface CampaignRepositoryInterface
    * Get campaigns that are scheduled and due to send (send_at <= now)
    */
   public function getScheduledDue();
+
+  /**
+   * Get campaigns that are draft and created_at descending
+   * @return Collection
+   */
+  public function getDraftAndCreatedAtDescending();
+
+  /**
+   * Get total campaigns
+   */
+  public function getTotal();
+
+  /**
+   * Get total by status
+   * @param string $status
+   * @return int
+   */
+  public function getTotalByStatus($status);
 }

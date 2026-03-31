@@ -91,4 +91,34 @@ class CampaignRepository implements CampaignRepositoryInterface
       ->where('send_at', '<=', now())
       ->get();
   }
+
+  /**
+   * Get campaigns that are draft and created_at descending
+   * @return Collection
+   */
+  public function getDraftAndCreatedAtDescending()
+  {
+    return Campaign::where('status', 'draft')
+      ->orderBy('created_at', 'desc')
+      ->get();
+  }
+
+  /*
+  * Get total campaigns
+  * @return int
+  */
+  public function getTotal()
+  {
+    return Campaign::count();
+  }
+
+  /*
+  * Get total by status
+  * @param string $status
+  * @return int
+  */
+  public function getTotalByStatus($status)
+  {
+    return Campaign::where('status', $status)->count();
+  }
 }
