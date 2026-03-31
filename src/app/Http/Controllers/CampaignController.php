@@ -16,7 +16,6 @@ class CampaignController extends BaseController
 
 public function store(Request $request)
 {
-    // 1. Validate dữ liệu đầu vào
     $request->validate([
         'title' => 'required|string|max:255',
         'body' => 'required',
@@ -24,9 +23,7 @@ public function store(Request $request)
         'subscriber_ids' => 'required|array',
     ]);
 
-    // 2. Sử dụng Transaction để đảm bảo tính an toàn (Atomic)
-    DB::transaction(function () use ($request) {
-        // Tạo Campaign mới
+    $campaign = DB::transaction(function () use ($request) {
         $campaign = Campaign::create([
             'title' => $request->title,
             'body' => $request->body,
@@ -35,7 +32,6 @@ public function store(Request $request)
             'created_by' => auth()->id(),
         ]);
 
-        // Chuẩn bị dữ liệu để Insert hàng loạt vào bảng trung gian
         $recipients = [];
         foreach ($request->subscriber_ids as $subscriberId) {
             $recipients[] = [
@@ -47,11 +43,21 @@ public function store(Request $request)
             ];
         }
 
-        // Bulk Insert: Tối ưu hiệu năng, chỉ tốn 1 câu lệnh SQL duy nhất
         CampaignRecipient::insert($recipients);
+        return $campaign;
     });
 
-    return redirect()->route('campaigns.index')->with('success', 'Chiến dịch đã được tạo và lên lịch gửi!');
+    // --- PHẦN BỔ SUNG: Đẩy vào Redis Queue ---
+    // Tính toán khoảng thời gian chờ (giây) từ bây giờ đến lúc gửi
+    $delay = now()->diffInSeconds($campaign->send_at);
+
+    // Dispatch Job và hẹn giờ (delay)
+    \App\Jobs\SendCampaignJob::dispatch($campaign)
+        ->onQueue('emails')
+        ->delay($delay);
+
+    return redirect()->route('campaigns.index')
+        ->with('success', 'Chiến dịch đã được tạo và lên lịch gửi vào lúc ' . $campaign->send_at);
 }
     
 }

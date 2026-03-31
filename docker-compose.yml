@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   app:
     build:
@@ -8,7 +10,7 @@ services:
       - ./src:/var/www
     depends_on:
       - db
-      - redis   # thêm dòng này
+      - redis
 
   nginx:
     image: nginx:latest
@@ -26,7 +28,7 @@ services:
     container_name: laravel_db
     restart: always
     environment:
-      MYSQL_DATABASE: quang
+      MYSQL_DATABASE: laravel
       MYSQL_ROOT_PASSWORD: root
       MYSQL_USER: user
       MYSQL_PASSWORD: password
@@ -35,7 +37,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
 
-  redis:
+  redis:   
     image: redis:alpine
     container_name: laravel_redis
     ports:

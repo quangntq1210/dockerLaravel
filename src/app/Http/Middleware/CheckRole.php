@@ -16,7 +16,7 @@ class CheckRole
      */
    public function handle(Request $request, Closure $next, string $role)
 {
-    // Kiểm tra xem user đã đăng nhập chưa và có đúng role không
+
     if (!auth()->check() || auth()->user()->role !== $role) {
         abort(403, 'Bạn không có quyền truy cập trang này.');
     }

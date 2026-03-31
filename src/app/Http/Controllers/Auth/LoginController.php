@@ -9,13 +9,15 @@ use Illuminate\Support\Facades\Auth;
 class LoginController extends Controller
 {
     // Hiển thị form
-    public function showLoginForm() {
+    public function showLoginForm()
+    {
         return view('auth.login');
     }
 
     // Xử lý đăng nhập
     // Xử lý đăng nhập
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
@@ -28,7 +30,7 @@ class LoginController extends Controller
             $user = Auth::user();
 
             // Kiểm tra Role: Nếu là 'admin' thì vào trang quản trị
-            if ($user->role === 'admin') {
+            if ($user->role == 'admin') {
                 return redirect()->intended('/admin/dashboard');
             }
 
@@ -42,7 +44,8 @@ class LoginController extends Controller
     }
 
     // Đăng xuất
-    public function logout(Request $request) {
+    public function logout(Request $request)
+    {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

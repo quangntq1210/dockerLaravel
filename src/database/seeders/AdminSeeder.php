@@ -12,10 +12,10 @@ class AdminSeeder extends Seeder
     {
         // Tạo tài khoản Admin mẫu
         User::updateOrCreate(
-            ['email' => 'admin@gmail.com'], // Kiểm tra nếu email này chưa có thì mới tạo
+            ['email' => 'admin@gmail.com'], 
             [
                 'name' => 'Quang Admin',
-                'password' => Hash::make('12345678'), // Luôn phải Hash mật khẩu
+                'password' => Hash::make('12345678'), 
                 'role' => 'admin',
             ]
         );

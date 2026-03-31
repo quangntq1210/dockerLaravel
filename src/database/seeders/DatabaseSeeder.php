@@ -4,6 +4,12 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Database\Seeders\AdminSeeder;
+use Database\Seeders\UserSeeder;
+use Database\Seeders\SubscriberSeeder;
+use Database\Seeders\CampaignSeeder;
+use Database\Seeders\NotificationSeeder;
+use Database\Seeders\CampaignRecipientSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,7 +20,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->call(AdminSeeder::class);
-        $this->call(UserSeeder::class);
+        $this->call([
+            AdminSeeder::class,
+            UserSeeder::class,
+            SubscriberSeeder::class,
+            CampaignSeeder::class,
+            NotificationSeeder::class,
+            CampaignRecipientSeeder::class,
+        ]);
     }
 }
