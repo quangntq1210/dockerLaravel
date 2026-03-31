@@ -33,7 +33,7 @@
   <div class="col-md-8">
     <div class="card shadow-sm">
       <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">📅 Tạo lịch gửi mới</h5>
+        <h5 class="mb-0">Tạo lịch gửi mới</h5>
       </div>
       <div class="card-body p-4">
         <form action="{{ route('admin.campaign-scheduling.store') }}" method="POST">

@@ -14,7 +14,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', 'App\Http\Controllers\AdminController@index')->name('admin.dashboard');
     Route::get('/campaign-scheduling', [CampaignSchedulingController::class, 'index'])->name('admin.campaign-scheduling');
     Route::post('/campaign-scheduling', [CampaignSchedulingController::class, 'store'])->name('admin.campaign-scheduling.store');
-    Route::get('/subscribers/search', 'App\Http\Controllers\SubscriberController@search');
+    Route::get('/subscribers/search', [SubscriberController::class, 'search'])->name('admin.subscribers.search');
 });
 
 Route::middleware(['auth', 'role:user'])->group(function () {

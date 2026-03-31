@@ -47,9 +47,9 @@
         <div class="row">
             <div class="col-md-2 sidebar shadow">
                 <h4 class="text-center text-primary fw-bold mb-4">QUANG CRM</h4>
-                <a href="/admin/dashboard">📊 Dashboard</a>
-                <a href="/admin/campaign-scheduling">📧 Lịch gửi thông báo</a>
-                <a href="/admin/subscribers">👥 Người đăng ký</a>
+                <a href="/admin/dashboard">Dashboard</a>
+                <a href="/admin/campaign-scheduling">Lịch gửi thông báo</a>
+                <a href="/admin/subscribers">Người đăng ký</a>
                 <hr>
                 <form action="/logout" method="POST" class="px-3">
                     @csrf
