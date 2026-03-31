@@ -6,23 +6,44 @@ use Illuminate\Http\Request;
 use App\Models\Campaign;
 use App\Models\Subscriber;
 use App\Models\Notification;
-use Illuminate\Support\Facades\Cache; // Để sau này làm Task 4.4 của Thắng
+use Illuminate\Support\Facades\Cache;
+use App\Repositories\Interfaces\CampaignRepositoryInterface;
+use App\Repositories\Interfaces\SubscriberRepositoryInterface;
+use App\Repositories\Interfaces\NotificationRepositoryInterface;
 
 class AdminController extends Controller
 {
+    protected $campaignRepo;
+    protected $subscriberRepo;
+    protected $notificationRepo;
+
     /**
-     * Trang Dashboard chính của Admin
+     * Constructor
+     */
+    public function __construct(
+        CampaignRepositoryInterface $campaignRepo,
+        SubscriberRepositoryInterface $subscriberRepo,
+        NotificationRepositoryInterface $notificationRepo
+    ) {
+        $this->campaignRepo = $campaignRepo;
+        $this->subscriberRepo = $subscriberRepo;
+        $this->notificationRepo = $notificationRepo;
+    }
+
+    /**
+     * Display the dashboard
      */
     public function index()
     {
-        // Tạm thời lấy dữ liệu trực tiếp, sau này Quang sẽ phối hợp với Thắng để dùng Cache
-        $stats = [
-            'total_campaigns' => Campaign::count(),
-            'total_subscribers' => Subscriber::count(),
-            'pending_jobs' => Campaign::where('status', 'scheduled')->count(),
-            'sent_notifications' => Notification::count(),
-        ];
+        $stats = Cache::remember('admin.dashboard.stats', 300, function () {
+            return [
+                'total_campaigns' => $this->campaignRepo->getTotal(),
+                'total_subscribers' => $this->subscriberRepo->getTotal(),
+                'pending_jobs' => $this->campaignRepo->getTotalByStatus('scheduled'),
+                'sent_notifications' => $this->notificationRepo->getTotal(),
+            ];
+        });
 
-        return view('layouts.dashboard', compact('stats')); 
+        return view('admin.dashboard', compact('stats'));
     }
 }

@@ -13,9 +13,10 @@ class NotificationRepository implements NotificationRepositoryInterface
      * @param int $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function getUserNotifications($userId, $perPage = 20, $page = 1)
+    public function getUserNotifications($userId, $perPage = 20, $page = 1, bool $unreadOnly = false)
     {
         return Notification::where('user_id', $userId)
+            ->when($unreadOnly, fn($q) => $q->whereNull('read_at'))
             ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
     }
@@ -50,6 +51,20 @@ class NotificationRepository implements NotificationRepositoryInterface
         $notification = $this->getById($id);
         if ($notification) {
             $notification->update(['read_at' => now()]);
+        }
+        return $notification;
+    }
+
+    /**
+     * Mark notification as unread
+     * @param int $id
+     * @return Notification|null
+     */
+    public function markAsUnread($id)
+    {
+        $notification = $this->getById($id);
+        if ($notification) {
+            $notification->update(['read_at' => null]);
         }
         return $notification;
     }
@@ -97,5 +112,14 @@ class NotificationRepository implements NotificationRepositoryInterface
             ->whereNull('read_at')
             ->orderBy('created_at', 'desc')
             ->get();
+    }
+
+    /**
+     * Get total notifications
+     * @return int
+     */
+    public function getTotal()
+    {
+        return Notification::count();
     }
 }

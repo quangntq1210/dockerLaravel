@@ -5,17 +5,17 @@ namespace App\Repositories\Interfaces;
 interface NotificationRepositoryInterface
 {
     /**
-     * Lấy danh sách notifications của user với pagination
+     * Get user notifications with pagination
      */
     public function getUserNotifications($userId, $perPage = 20, $page = 1);
 
     /**
-     * Lấy số lượng unread notifications của user
+     * Get unread count of user
      */
     public function getUnreadCount($userId);
 
     /**
-     * Lấy notification theo ID
+     * Get notification by ID
      */
     public function getById($id);
 
@@ -25,22 +25,33 @@ interface NotificationRepositoryInterface
     public function markAsRead($id);
 
     /**
-     * Mark all notifications as read (bulk)
+     * Mark all notifications as read
      */
     public function markAllAsRead($userId);
 
     /**
-     * Tạo notification mới
+     * Mark notification as unread by ID
+     */
+    public function markAsUnread($id);
+
+    /**
+     * Create new notification
      */
     public function create($data);
 
     /**
-     * Xóa notification
+     * Delete notification by ID
      */
     public function delete($id);
 
     /**
-     * Lấy unread notifications
+     * Get unread notifications
      */
     public function getUnread($userId);
+
+    /**
+     * Get total notifications
+     * @return int
+     */
+    public function getTotal();
 }
