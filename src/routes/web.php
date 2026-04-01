@@ -1,52 +1,71 @@
 <?php
 
-use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
-    use App\Models\Campaign;
-use App\Jobs\SendCampaignJob;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CampaignSchedulingController;
+use App\Http\Controllers\SubscriberController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\LocaleController;
 
 
 Route::get('/', function () {
-    return view('welcome');
+    if (auth()->check()) {
+        return auth()->user()->role === 'admin'
+            ? redirect()->route('admin.dashboard')
+            : redirect()->route('notifications.index');
+    }
+    return redirect()->route('login');
 });
 
-Route::get('/login', 'App\Http\Controllers\Auth\LoginController@showLoginForm')->name('login');
-Route::post('/login', 'App\Http\Controllers\Auth\LoginController@login')->name('login.post');
-Route::post('/logout', 'App\Http\Controllers\Auth\LoginController@logout')->name('logout');
 
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', 'App\Http\Controllers\AdminController@index')->name('admin.dashboard');
-    Route::resource('campaigns', 'App\Http\Controllers\CampaignController');
-    Route::get('/subscribers/search', 'App\Http\Controllers\SubscriberController@search');
+Route::controller(LoginController::class)->group(function () {
+    Route::get('/login', 'showLoginForm')->name('login');
+    Route::post('/login', 'login')->name('login.post');
+    Route::post('/logout', 'logout')->name('logout');
 });
+
+Route::prefix('admin')
+    ->middleware(['auth', 'role:admin'])
+    ->as('admin.')
+    ->group(function () {
+
+        // Dashboard
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])
+            ->name('dashboard');
+
+        // Campaign Scheduling (RESTful)
+        Route::controller(CampaignSchedulingController::class)->group(function () {
+            Route::get('/campaigns', 'index')->name('campaigns.index');
+            Route::post('/campaigns', 'store')->name('campaigns.store');
+        });
+
+        // Subscribers
+        Route::controller(SubscriberController::class)->group(function () {
+            Route::get('/subscribers/search', 'search')->name('subscribers.search');
+        });
+});
+// route language switch
+Route::put('/locale', [LocaleController::class, 'update'])
+    ->name('locale.update');
 
 Route::middleware(['auth', 'role:user'])->group(function () {
 
+    // Notification page
     Route::get('/notifications', [NotificationController::class, 'index'])
         ->name('notifications.index');
 
-    Route::prefix('api/user')->group(function () {
-        Route::get('/notifications', [NotificationController::class, 'list'])->name('api.user.notifications.list');
-        Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('api.user.notifications.unread-count');
-        Route::put('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('api.user.notifications.read-all');
-        Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('api.user.notifications.read');
-        Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('api.user.notifications.destroy');
-    });
+    Route::prefix('api/user/notifications')
+        ->as('api.user.notifications.')
+        ->group(function () {
 
+            Route::get('/', [NotificationController::class, 'list'])->name('list');
+            Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('unread-count');
 
-Route::get('/test-mail', function () {
-    // 1. Tạo 1 chiến dịch giả lập
-    $campaign = Campaign::create([
-        'title' => 'Tiêu đề Test Mailtrap',
-        'body' => 'Nội dung gửi thử qua hệ thống hàng đợi Redis.',
-        'status' => 'pending',
-        'send_at' => now(),
-        'created_by' => 1
-    ]);
+            Route::put('/read-all', [NotificationController::class, 'markAllAsRead'])->name('read-all');
+            Route::put('/{id}/read', [NotificationController::class, 'markAsRead'])->name('read');
+            Route::put('/{id}/unread', [NotificationController::class, 'markAsUnread'])->name('unread');
 
-    // 2. Đẩy vào hàng đợi
-    SendCampaignJob::dispatch($campaign)->onQueue('emails');
-
-    return "Đã đẩy job gửi mail vào Redis! Hãy kiểm tra Mailtrap.";
-});
+            Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
+        });
 });

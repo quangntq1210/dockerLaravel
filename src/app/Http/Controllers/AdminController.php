@@ -6,23 +6,40 @@ use Illuminate\Http\Request;
 use App\Models\Campaign;
 use App\Models\Subscriber;
 use App\Models\Notification;
-use Illuminate\Support\Facades\Cache; // Để sau này làm Task 4.4 của Thắng
+use Illuminate\Support\Facades\Cache;
+use App\Repositories\Interfaces\CampaignRepositoryInterface;
+use App\Repositories\Interfaces\SubscriberRepositoryInterface;
+use App\Repositories\Interfaces\NotificationRepositoryInterface;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use App\Services\AdminService;
 
 class AdminController extends Controller
 {
-    /**
-     * Trang Dashboard chính của Admin
-     */
-    public function index()
-    {
-        // Tạm thời lấy dữ liệu trực tiếp, sau này Quang sẽ phối hợp với Thắng để dùng Cache
-        $stats = [
-            'total_campaigns' => Campaign::count(),
-            'total_subscribers' => Subscriber::count(),
-            'pending_jobs' => Campaign::where('status', 'scheduled')->count(),
-            'sent_notifications' => Notification::count(),
-        ];
+ 
+    protected $adminService;
 
-        return view('layouts.dashboard', compact('stats')); 
+    public function __construct(AdminService $adminService)
+    {
+        $this->adminService = $adminService;
+    } 
+
+    public function dashboard(Request $request)
+{
+    $result = $this->adminService->getDashboardData($request);
+
+  
+    if ($request->ajax()) {
+        return response()->json([
+            'table' => view('admin.partials.dashboard_table', [
+                'data' => $result['data']
+            ])->render()
+        ]);
     }
+
+    return view('admin.dashboard', $result);
 }
+}
+
+
+
