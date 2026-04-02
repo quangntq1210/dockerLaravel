@@ -4,21 +4,25 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Repositories\Eloquent\NotificationRepository;
 use App\Http\Controllers\ApiController;
+use App\Http\Services\NotificationService;
 
 class NotificationController extends ApiController
 {
-    protected $notificationRepo;
+    protected $notificationService;
 
-    public function __construct(NotificationRepository $notificationRepo)
+    /**
+     * Constructor
+     * @param NotificationService $notificationService
+     * @return void
+     */
+    public function __construct(NotificationService $notificationService)
     {
-        $this->notificationRepo = $notificationRepo;
+        $this->notificationService = $notificationService;
     }
 
     /**
-     * Display a listing of the resource.
-     *
+     * View notifications
      * @return \Illuminate\Contracts\View\View
      */
     public function index()
@@ -27,98 +31,43 @@ class NotificationController extends ApiController
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
+     * Remove notification by ID
      * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Throwable
      */
     public function destroy($id)
     {
-        $notification = $this->notificationRepo->delete($id);
-        if (!$notification) {
-            return $this->error('Notification not found', 404);
-        }
-        return $this->success('Notification deleted successfully', null, null, 200);
+        $this->notificationService->delete($id);
+        return $this->success(__('message.notification_deleted'));
     }
 
     /**
      * List notifications
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Throwable
      */
     public function list(Request $request): JsonResponse
     {
         $userId = auth()->id();
-        $notifications = $this->notificationRepo->getUserNotifications(
-            $userId,
-            $request->get('per_page', 10),
-            $request->get('page', 1),
-            $request->boolean('unread')
-        );
-        return $this->success('Notifications fetched successfully', [
-            'data' => $notifications->items(),
-            'meta' => [
+        $perPage = $request->get('per_page', 10);
+        $page = $request->get('page', 1);
+        $unreadOnly = $request->boolean('unread');
+
+        $notifications = $this->notificationService->list($userId, $perPage, $page, $unreadOnly);
+
+        return $this->success(
+            __('message.notifications_fetched'),
+            $notifications->items(),
+            [
                 'current_page' => $notifications->currentPage(),
                 'per_page'     => $notifications->perPage(),
                 'total'        => $notifications->total(),
-                'unread_count' => $this->notificationRepo->getUnreadCount($userId),
+                'unread_count' => $this->notificationService->getUnreadCount($userId),
             ],
-        ]);
+            200
+        );
     }
 
     /**
@@ -128,11 +77,8 @@ class NotificationController extends ApiController
      */
     public function markAsRead($id)
     {
-        $notification = $this->notificationRepo->markAsRead($id);
-        if (!$notification) {
-            return $this->error('Notification not found', 404);
-        }
-        return $this->success('Notification marked as read successfully', null, null, 200);
+        $this->notificationService->markAsRead($id);
+        return $this->success(__('message.notification_marked_as_read'), null, null, 200);
     }
 
     /**
@@ -142,21 +88,8 @@ class NotificationController extends ApiController
      */
     public function markAsUnread($id)
     {
-        $notification = $this->notificationRepo->markAsUnread($id);
-        if (!$notification) {
-            return $this->error('Notification not found', 404);
-        }
-        return $this->success('Notification marked as unread successfully', null, null, 200);
-    }
-
-    /**
-     * Get unread count
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function unreadCount()
-    {
-        $count = $this->notificationRepo->getUnreadCount(auth()->id());
-        return $this->success('Unread count fetched successfully', $count, null, 200);
+        $this->notificationService->markAsUnread($id);
+        return $this->success(__('message.notification_marked_as_unread'), null, null, 200);
     }
 
     /**
@@ -165,7 +98,8 @@ class NotificationController extends ApiController
      */
     public function markAllAsRead()
     {
-        $count = $this->notificationRepo->markAllAsRead(auth()->id());
-        return $this->success('Notifications marked as read successfully', null, null, 200);
+        $userId = auth()->id();
+        $this->notificationService->markAllAsRead($userId);
+        return $this->success(__('message.notifications_marked_as_read'), null, null, 200);
     }
 }

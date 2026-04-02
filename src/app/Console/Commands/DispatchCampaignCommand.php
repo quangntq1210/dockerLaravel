@@ -13,8 +13,6 @@ class DispatchCampaignCommand extends Command
 {
     protected $signature = 'campaigns:dispatch';
 
-    protected $description = 'Dispatch jobs for campaigns that are scheduled and due to send';
-
     protected $campaignRepo;
     protected $recipientRepo;
 
@@ -44,30 +42,28 @@ class DispatchCampaignCommand extends Command
         $campaigns = $this->campaignRepo->getScheduledDue();
 
         if ($campaigns->isEmpty()) {
-            $this->info('No campaigns to dispatch.');
+            $this->info(__('message.campaigns_dispatch_empty'));
             return;
         }
 
         foreach ($campaigns as $campaign) {
-            DB::transaction(function () use ($campaign) {
-                if (!$this->campaignRepo->claimScheduledCampaign($campaign->id)) {
-                    return;
+            if (!$this->campaignRepo->claimScheduledCampaign($campaign->id)) {
+                return;
+            }
+
+            $recipients = $this->recipientRepo->getPendingByCampaignId($campaign->id);
+
+            $dispatched = 0;
+            foreach ($recipients as $recipient) {
+                if (!$this->recipientRepo->claimPendingRecipient($recipient->id)) {
+                    continue;
                 }
 
-                $recipients = $this->recipientRepo->getPendingByCampaignId($campaign->id);
+                SendCampaignJob::dispatch($recipient);
+                $dispatched++;
+            }
 
-                $dispatched = 0;
-                foreach ($recipients as $recipient) {
-                    if (!$this->recipientRepo->claimPendingRecipient($recipient->id)) {
-                        continue;
-                    }
-
-                    SendCampaignJob::dispatch($recipient);
-                    $dispatched++;
-                }
-
-                $this->info("Dispatched {$dispatched} jobs for campaign [{$campaign->id}] \"{$campaign->title}\".");
-            });
+            $this->info("Dispatched {$dispatched} jobs for campaign [{$campaign->id}] \"{$campaign->title}\".");
         }
 
         Cache::forget('admin.dashboard.stats');
