@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
 use App\Repositories\Interfaces\NotificationRepositoryInterface;
 use App\Repositories\Eloquent\NotificationRepository;
+use Illuminate\Pagination\Paginator;
+use App\Repositories\Interfaces\DashboardRepositoryInterface;
+use App\Repositories\DashboardRepository;
+use Illuminate\Support\Facades\App;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->bind(DashboardRepositoryInterface::class, DashboardRepository::class);
     }
 
     /**
@@ -27,6 +31,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+         App::setLocale(session('locale') ?? config('app.locale'));
+         Paginator::useBootstrap();
     }
 }

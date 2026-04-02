@@ -2,66 +2,74 @@
 
 namespace App\Jobs;
 
-use App\Models\Campaign;
-use App\Models\Subscriber;
-use App\Models\CampaignRecipient;
-use App\Models\Notification;
 use App\Mail\CampaignMail;
+use App\Models\CampaignRecipient;
+use App\Repositories\Interfaces\CampaignRecipientsRepositoryInterface;
+use App\Repositories\Interfaces\CampaignRepositoryInterface;
+use App\Repositories\Interfaces\NotificationRepositoryInterface;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
-
+use Illuminate\Support\Facades\DB;
 class SendCampaignJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $campaign;
-
-    public function __construct(Campaign $campaign)
+    public $tries = 3;
+    public $recipient;
+    public function __construct(CampaignRecipient $recipient)
     {
-        $this->campaign = $campaign;
+        $this->recipient = $recipient;
     }
 
-    
-  public function handle()
-    {
-        // 1. Cập nhật trạng thái campaign sang 'sending'
-        $this->campaign->update(['status' => 'sending']);
+public function handle(
+    NotificationRepositoryInterface $notifRepo,
+    CampaignRecipientsRepositoryInterface $recipientRepo,
+    CampaignRepositoryInterface $campaignRepo
+) {
+    $recipient  = $this->recipient;
+    $campaign   = $recipient->campaign;
+    $subscriber = $recipient->subscriber;
 
-        // 2. Lấy danh sách recipients
-        $recipients = $this->campaign->recipients()->with('subscriber')->get();
+    if (!$campaign || !$subscriber) {
+        $recipientRepo->update(['status' => 'failed'], $recipient->id);
+        return;
+    }
+    Mail::to($subscriber->email)
+        ->send(new CampaignMail($campaign, $subscriber));
 
-        foreach ($recipients as $recipient) {
-            try {
-                $subscriber = $recipient->subscriber;
+    DB::beginTransaction();
 
-                // GỬI EMAIL (Đã bỏ dấu \ vì đã có 'use' ở đầu file)
-                Mail::to($subscriber->email)->send(new CampaignMail($this->campaign));
-
-                // Cập nhật trạng thái thành công
-                $recipient->update([
-                    'status' => 'sent',
-                    'sent_at' => now()
-                ]);
-
-                // TẠO THÔNG BÁO (Đã bỏ dấu \ vì đã có 'use' ở đầu file)
-                if ($subscriber->user_id) {
-                    Notification::create([
-                        'user_id' => $subscriber->user_id,
-                        'campaign_id' => $this->campaign->id,
-                        'title' => $this->campaign->title,
-                        'message' => "Thông báo mới: " . $this->campaign->title,
-                    ]);
-                }
-            } catch (\Exception $e) {
-                $recipient->update(['status' => 'failed']);
-            }
+    try {
+        if ($subscriber->user_id) {
+            $notifRepo->create([
+                'user_id'     => $subscriber->user_id,
+                'campaign_id' => $campaign->id,
+                'title'       => $campaign->title,
+                'message'     => $campaign->body,
+            ]);
         }
 
-        // 3. Hoàn tất
-        $this->campaign->update(['status' => 'completed']);
+        $recipientRepo->update([
+            'status'  => 'sent',
+            'sent_at' => now(),
+        ], $recipient->id);
+
+        if (!$recipientRepo->hasPending($campaign->id)) {
+            $campaignRepo->update(['status' => 'sent'], $campaign->id);
+        }
+
+        DB::commit();
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        $recipientRepo->update(['status' => 'failed'], $recipient->id);
+
+        throw $e; 
     }
+}
 }

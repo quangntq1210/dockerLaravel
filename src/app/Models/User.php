@@ -11,6 +11,12 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    const ROLE_USER = 'user';
+    const ROLE_ADMIN = 'admin';
+    const ROLES = [
+        self::ROLE_USER,
+        self::ROLE_ADMIN
+    ];
     /**
      * The attributes that are mass assignable.
      *

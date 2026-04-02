@@ -17,14 +17,10 @@ class Campaign extends Authenticatable
      * @var array
      */
    protected $fillable = ['title', 'body', 'send_at', 'status', 'created_by'];
-
-    // Lấy danh sách record trung gian
     public function recipients()
     {
         return $this->hasMany(CampaignRecipient::class);
     }
-
-    // Lấy trực tiếp danh sách subscriber thông qua bảng trung gian
     public function subscribers()
     {
         return $this->belongsToMany(Subscriber::class, 'campaign_recipients');
