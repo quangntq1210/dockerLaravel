@@ -3,8 +3,8 @@
 @section('content')
 <div class="row">
   <div class="col-md-12 mb-4">
-    <h2 class="fw-bold">Lịch gửi thông báo</h2>
-    <p class="text-muted">Chọn campaign, danh sách người nhận và thời gian gửi</p>
+    <h2 class="fw-bold">{{ __('message.campaign_scheduling') }}</h2>
+    <p class="text-muted">{{ __('message.campaign_scheduling_description') }}</p>
   </div>
 </div>
 
@@ -33,7 +33,7 @@
   <div class="col-md-8">
     <div class="card shadow-sm">
       <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">Tạo lịch gửi mới</h5>
+        <h5 class="mb-0">{{ __('message.create_campaign_scheduling') }}</h5>
       </div>
       <div class="card-body p-4">
         <form action="{{ route('admin.campaign-scheduling.store') }}" method="POST">
@@ -42,11 +42,14 @@
           {{-- Select Campaign --}}
           <div class="mb-4">
             <label for="campaign_id" class="form-label fw-semibold">
-              Campaign <span class="text-danger">*</span>
+              {{ __('message.campaign') }} <span class="text-danger">*</span>
             </label>
             <select name="campaign_id" id="campaign_id"
               class="form-select @error('campaign_id') is-invalid @enderror">
-              <option value="">-- Chọn campaign --</option>
+              <option value="">-- {{ __('message.select_campaign') }} --</option>
+              @if($campaigns->isEmpty())
+              <option value="">-- {{ __('message.campaigns_dispatch_empty') }} --</option>
+              @else
               @foreach ($campaigns as $campaign)
               <option value="{{ $campaign->id }}"
                 {{ old('campaign_id') == $campaign->id ? 'selected' : '' }}>
@@ -54,37 +57,38 @@
                 <span class="badge">{{ $campaign->status }}</span>
               </option>
               @endforeach
+              @endif
             </select>
             @error('campaign_id')
             <div class="invalid-feedback">{{ $message }}</div>
             @enderror
-            <small class="text-muted">Chỉ hiển thị campaign ở trạng thái draft/scheduled</small>
+            <small class="text-muted">{{ __('message.campaign_only_show_draft_scheduled') }}</small>
           </div>
 
           {{-- Select Subscribers --}}
           <div class="mb-4">
             <label class="form-label fw-semibold">
-              Người nhận <span class="text-danger">*</span>
+              {{ __('message.recipients') }} <span class="text-danger">*</span>
             </label>
 
             {{-- Search Subscribers with AJAX --}}
             <div class="input-group mb-2">
-              <span class="input-group-text"><i>Tìm kiếm</i></span>
+              <span class="input-group-text"><i>{{ __('message.search') }}</i></span>
               <input type="text" id="subscriber-search"
                 class="form-control"
-                placeholder="Tìm theo tên hoặc email...">
+                placeholder="{{ __('message.search_by_name_or_email') }}">
             </div>
 
             {{-- Search results --}}
             <div id="search-results" class="border rounded p-2 mb-2"
               style="max-height: 180px; overflow-y: auto; display: none; background: #fff;">
-              <small class="text-muted">Đang tìm kiếm...</small>
+              <small class="text-muted">{{ __('message.searching') }}</small>
             </div>
 
             {{-- Selected subscribers (tags) --}}
             <div id="selected-subscribers" class="d-flex flex-wrap gap-2 p-2 border rounded bg-light"
               style="min-height: 50px;">
-              <span class="text-muted small" id="empty-hint">Chưa chọn người nhận nào</span>
+              <span class="text-muted small" id="empty-hint">{{ __('message.no_recipients_selected') }}</span>
             </div>
 
             {{-- Hidden inputs will be created dynamically by JS --}}
@@ -93,13 +97,13 @@
             @error('subscriber_ids')
             <div class="text-danger small mt-1">{{ $message }}</div>
             @enderror
-            <small class="text-muted">Có thể chọn nhiều người nhận</small>
+            <small class="text-muted">{{ __('message.can_select_multiple_recipients') }}</small>
           </div>
 
           {{-- Send time --}}
           <div class="mb-4">
             <label for="send_at" class="form-label fw-semibold">
-              Thời gian gửi <span class="text-danger">*</span>
+              {{ __('message.send_time') }} <span class="text-danger">*</span>
             </label>
             <input type="datetime-local"
               name="send_at"
@@ -110,16 +114,16 @@
             @error('send_at')
             <div class="invalid-feedback">{{ $message }}</div>
             @enderror
-            <small class="text-muted">Phải chọn thời gian trong tương lai</small>
+            <small class="text-muted">{{ __('message.must_select_future_time') }}</small>
           </div>
 
           {{-- Action buttons --}}
           <div class="d-flex gap-2">
             <button type="submit" class="btn btn-primary px-4">
-              Lưu lịch gửi
+              {{ __('message.save_campaign_scheduling') }}
             </button>
             <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary px-4">
-              Huỷ
+              {{ __('message.cancel') }}
             </a>
           </div>
         </form>
@@ -130,18 +134,18 @@
   {{-- Guide panel --}}
   <div class="col-md-4">
     <div class="card border-info">
-      <div class="card-header bg-info text-white">Hướng dẫn</div>
+      <div class="card-header bg-info text-white">{{ __('message.guide') }}</div>
       <div class="card-body small">
         <ol class="ps-3">
-          <li class="mb-2">Chọn <strong>Campaign</strong> muốn gửi (đã tạo sẵn).</li>
-          <li class="mb-2">Tìm và thêm <strong>người nhận</strong> vào danh sách.</li>
-          <li class="mb-2">Chọn <strong>thời gian gửi</strong> trong tương lai.</li>
-          <li>Nhấn <strong>Lưu</strong> để đặt lịch.</li>
+          <li class="mb-2">{{ __('message.select_campaign_to_send') }}</li>
+          <li class="mb-2">{{ __('message.search_and_add_recipients') }}</li>
+          <li class="mb-2">{{ __('message.select_send_time') }}</li>
+          <li>{{ __('message.click_save_to_schedule') }}</li>
         </ol>
         <hr>
-        <p class="mb-1"><strong>Trạng thái sau khi lưu:</strong></p>
+        <p class="mb-1"><strong>{{ __('message.status_after_saving') }}</strong></p>
         <span class="badge bg-warning text-dark">scheduled</span>
-        <p class="mt-2 text-muted">Scheduler sẽ tự động dispatch job khi đến giờ.</p>
+        <p class="mt-2 text-muted">{{ __('message.scheduler_will_automatically_dispatch_job_when_time_comes') }}</p>
       </div>
     </div>
   </div>
@@ -166,12 +170,12 @@
   });
 
   function searchSubscribers(q) {
-    $('#search-results').show().html('<small class="text-muted">Đang tìm...</small>');
-    $.get('/admin/subscribers/search', {
+    $('#search-results').show().html('<small class="text-muted">{{ __('message.searching') }}</small>');
+    $.get(@js(route('admin.subscribers.search'))), {
       q
     }, function(data) {
       if (!data.length) {
-        $('#search-results').html('<small class="text-muted">Không tìm thấy kết quả</small>');
+        $('#search-results').html('<small class="text-muted">{{ __('message.no_results_found') }}</small>');
         return;
       }
       let html = '';
@@ -181,7 +185,7 @@
                               style="cursor:pointer"
                               data-id="${sub.id}" data-name="${sub.name}" data-email="${sub.email}">
                             <span>${sub.name} <small class="text-muted">(${sub.email})</small></span>
-                            <span class="${disabled} small">${selectedIds.has(sub.id) ? '✓ Đã chọn' : '+ Thêm'}</span>
+                            <span class="${disabled} small">${selectedIds.has(sub.id) ? '✓ {{ __('message.selected') }}' : '+ {{ __('message.add') }}'}</span>
                          </div>`;
       });
       $('#search-results').html(html);
@@ -213,7 +217,7 @@
     );
 
     // Update search results
-    $(`[data-id="${id}"] span:last`).removeClass('text-primary').addClass('text-muted').text('✓ Đã chọn');
+    $(`[data-id="${id}"] span:last`).removeClass('text-primary').addClass('text-muted').text('✓ {{ __('message.selected') }}');
   });
 
   function removeSubscriber(id) {
@@ -222,7 +226,7 @@
     $(`#input-${id}`).remove();
     if (selectedIds.size === 0) $('#empty-hint').show();
     // Reset state in search results
-    $(`[data-id="${id}"] span:last`).removeClass('text-muted').addClass('text-primary').text('+ Thêm');
+    $(`[data-id="${id}"] span:last`).removeClass('text-muted').addClass('text-primary').text('+ {{ __('message.add') }}');
   }
 
   // Hide search results when clicking outside

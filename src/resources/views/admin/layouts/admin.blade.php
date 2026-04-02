@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QUANG CRM - Admin</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ __('message.notification_management') }} - Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -46,14 +47,13 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2 sidebar shadow">
-                <h4 class="text-center text-primary fw-bold mb-4">QUANG CRM</h4>
-                <a href="/admin/dashboard">Dashboard</a>
-                <a href="/admin/campaign-scheduling">Lịch gửi thông báo</a>
-                <a href="/admin/subscribers">Người đăng ký</a>
+                <h4 class="text-center text-primary fw-bold mb-4">{{ __('message.notification_management') }}</h4>
+                <a href="/admin/dashboard">{{ __('message.dashboard') }}</a>
+                <a href="/admin/campaign-scheduling">{{ __('message.campaign_scheduling') }}</a>
                 <hr>
                 <form action="/logout" method="POST" class="px-3">
                     @csrf
-                    <button class="btn btn-outline-danger btn-sm w-100">Đăng xuất</button>
+                    <button class="btn btn-outline-danger btn-sm w-100">{{ __('message.logout') }}</button>
                 </form>
             </div>
 
@@ -62,6 +62,7 @@
             </div>
         </div>
     </div>
+    <script>{{ asset('js/app.js') }}</script>
 </body>
 
 </html>
