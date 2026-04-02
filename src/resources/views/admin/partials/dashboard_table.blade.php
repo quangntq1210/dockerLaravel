@@ -1,3 +1,7 @@
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+@endpush
+
 <table class="table table-bordered table-hover">
     <thead class="table-light">
         <tr>
@@ -18,9 +22,9 @@
                 <td>{{ $row->title }}</td>
                 <td>
                     @if($row->status == 'sent')
-                        <span class="badge bg-success">Sent</span>
+                 <span class="badge bg-success">{{ __('dashboard.status_sent') }}</span>
                     @elseif($row->status == 'processing')
-                        <span class="badge bg-warning">Processing</span>
+                     <span class="badge bg-warning">{{ __('dashboard.status_processing') }}</span>
                     @else
                         <span class="badge bg-secondary">{{ $row->status }}</span>
                     @endif
