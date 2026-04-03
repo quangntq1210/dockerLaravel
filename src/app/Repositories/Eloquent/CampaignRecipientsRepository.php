@@ -19,13 +19,10 @@ class CampaignRecipientsRepository implements CampaignRecipientsRepositoryInterf
   }
 
   /*
-  * Create new campaign recipients in bulk
-  * @param array $data
   * @return bool
   */
   public function createBulk(array $data)
   {
-    return CampaignRecipient::insert($data);
   }
 
   /*
@@ -59,6 +56,7 @@ class CampaignRecipientsRepository implements CampaignRecipientsRepositoryInterf
     return CampaignRecipient::where('campaign_id', $campaignId)->delete();
   }
 
+
   /*
   * Get campaign recipient by ID
   * @param int $id
@@ -69,6 +67,7 @@ class CampaignRecipientsRepository implements CampaignRecipientsRepositoryInterf
     return CampaignRecipient::find($id);
   }
 
+  
   /*
   * Get all campaign recipients
   * @return Collection
@@ -77,6 +76,7 @@ class CampaignRecipientsRepository implements CampaignRecipientsRepositoryInterf
   {
     return CampaignRecipient::all();
   }
+
 
   /*
   * Get campaign recipients by user ID
@@ -87,6 +87,7 @@ class CampaignRecipientsRepository implements CampaignRecipientsRepositoryInterf
   {
     return CampaignRecipient::where('user_id', $userId)->get();
   }
+
 
   /*
   * Get campaign recipients by user ID with pagination
@@ -100,6 +101,7 @@ class CampaignRecipientsRepository implements CampaignRecipientsRepositoryInterf
     return CampaignRecipient::where('user_id', $userId)->paginate($perPage, ['*'], 'page', $page);
   }
 
+
   /*
   * Get pending recipients by campaign ID
   * @param int $campaignId
@@ -111,6 +113,7 @@ class CampaignRecipientsRepository implements CampaignRecipientsRepositoryInterf
       ->where('status', 'pending')
       ->get();
   }
+
 
   /*
   * Check if campaign still has pending recipients

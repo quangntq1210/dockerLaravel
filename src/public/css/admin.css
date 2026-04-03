@@ -1,0 +1,65 @@
+      body {
+          background-color: #f8f9fa;
+      }
+
+      .sidebar {
+          background: #212529;
+          color: white;
+          padding-top: 20px;
+      }
+
+      .sidebar h4 {
+          font-size: 1.2rem;
+      }
+
+      .sidebar a {
+          color: #adb5bd;
+          text-decoration: none;
+          padding: 10px 20px;
+          display: block;
+          border-radius: 5px;
+      }
+
+      .sidebar a:hover {
+          background: #343a40;
+          color: white;
+      }
+
+      .language-switcher {
+          margin-top: 20px;
+          padding: 0 20px;
+
+      }
+
+      .card-stat {
+          border: none;
+          border-radius: 10px;
+          transition: 0.3s;
+      }
+
+      .card-stat:hover {
+          transform: translateY(-5px);
+      }
+
+      .sidebar {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          height: 100vh;
+      }
+
+      .language-switcher {
+          padding: 10px 20px;
+          border-radius: 22px;
+
+      }
+
+      .language-switcher select {
+          width: 100%;
+          max-width: 180px;
+          border-radius: 8px;
+          background-color: #20262e;
+          color: #ffffff;
+          border-color: #8a8a8ac7;
+          cursor: pointer;
+      }

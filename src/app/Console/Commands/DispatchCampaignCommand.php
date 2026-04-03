@@ -9,6 +9,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
+
 class DispatchCampaignCommand extends Command
 {
     protected $signature = 'campaigns:dispatch';
@@ -49,6 +50,16 @@ class DispatchCampaignCommand extends Command
         }
 
         foreach ($campaigns as $campaign) {
+            $this->campaignRepo->update(['status' => 'processing'], $campaign->id);
+
+            $recipients = $this->recipientRepo->getPendingByCampaignId($campaign->id);
+
+            foreach ($recipients as $recipient) {
+                SendCampaignJob::dispatch($recipient);
+            }
+
+            $this->info("Dispatched {$recipients->count()} jobs for campaign [{$campaign->id}] \"{$campaign->title}\".");
+        }
             DB::transaction(function () use ($campaign) {
                 if (!$this->campaignRepo->claimScheduledCampaign($campaign->id)) {
                     return;
@@ -72,4 +83,4 @@ class DispatchCampaignCommand extends Command
 
         Cache::forget('admin.dashboard.stats');
     }
-}
+

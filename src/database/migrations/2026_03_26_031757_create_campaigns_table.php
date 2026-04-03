@@ -16,7 +16,7 @@ class CreateCampaignsTable extends Migration
         Schema::create('campaigns', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('body');
+            $table->text('body');
             $table->dateTime('send_at');
             $table->enum('status', ['draft', 'scheduled', 'processing', 'sent', 'failed', 'cancelled'])->default('scheduled');
             $table->unsignedBigInteger('created_by');

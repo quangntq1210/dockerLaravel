@@ -8,7 +8,10 @@
   </div>
 </div>
 
+<<<<<<< HEAD
+=======
 {{-- Display errors --}}
+>>>>>>> d6edc5e93a1341eca53919208a0412602627170e
 @if ($errors->any())
 <div class="alert alert-danger alert-dismissible fade show">
   <ul class="mb-0">
@@ -20,7 +23,11 @@
 </div>
 @endif
 
+<<<<<<< HEAD
+
+=======
 {{-- Display success message --}}
+>>>>>>> d6edc5e93a1341eca53919208a0412602627170e
 @if (session('success'))
 <div class="alert alert-success alert-dismissible fade show">
   {{ session('success') }}
@@ -33,10 +40,17 @@
   <div class="col-md-8">
     <div class="card shadow-sm">
       <div class="card-header bg-primary text-white">
+<<<<<<< HEAD
+        <h5 class="mb-0">📅 Tạo lịch gửi mới</h5>
+      </div>
+      <div class="card-body p-4">
+        <form action="{{ route('admin.campaigns.store') }}" method="POST">
+=======
         <h5 class="mb-0">Tạo lịch gửi mới</h5>
       </div>
       <div class="card-body p-4">
         <form action="{{ route('admin.campaign-scheduling.store') }}" method="POST">
+>>>>>>> d6edc5e93a1341eca53919208a0412602627170e
           @csrf
 
           {{-- Select Campaign --}}
@@ -87,7 +101,11 @@
               <span class="text-muted small" id="empty-hint">Chưa chọn người nhận nào</span>
             </div>
 
+<<<<<<< HEAD
+  
+=======
             {{-- Hidden inputs will be created dynamically by JS --}}
+>>>>>>> d6edc5e93a1341eca53919208a0412602627170e
             <div id="subscriber-inputs"></div>
 
             @error('subscriber_ids')
@@ -96,7 +114,10 @@
             <small class="text-muted">Có thể chọn nhiều người nhận</small>
           </div>
 
+<<<<<<< HEAD
+=======
           {{-- Send time --}}
+>>>>>>> d6edc5e93a1341eca53919208a0412602627170e
           <div class="mb-4">
             <label for="send_at" class="form-label fw-semibold">
               Thời gian gửi <span class="text-danger">*</span>
@@ -113,7 +134,11 @@
             <small class="text-muted">Phải chọn thời gian trong tương lai</small>
           </div>
 
+<<<<<<< HEAD
+
+=======
           {{-- Action buttons --}}
+>>>>>>> d6edc5e93a1341eca53919208a0412602627170e
           <div class="d-flex gap-2">
             <button type="submit" class="btn btn-primary px-4">
               Lưu lịch gửi
@@ -126,8 +151,11 @@
       </div>
     </div>
   </div>
+<<<<<<< HEAD
+=======
 
   {{-- Guide panel --}}
+>>>>>>> d6edc5e93a1341eca53919208a0412602627170e
   <div class="col-md-4">
     <div class="card border-info">
       <div class="card-header bg-info text-white">Hướng dẫn</div>
@@ -147,7 +175,10 @@
   </div>
 </div>
 
+<<<<<<< HEAD
+=======
 {{-- Bootstrap JS + jQuery + AJAX Search --}}
+>>>>>>> d6edc5e93a1341eca53919208a0412602627170e
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
