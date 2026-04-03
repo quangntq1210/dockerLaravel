@@ -61,4 +61,14 @@ interface CampaignRepositoryInterface
    * @return int
    */
   public function getTotalByStatus($status);
+<<<<<<< HEAD
+=======
+
+  /**
+   * Claim scheduled campaign
+   * @param int $campaignId
+   * @return bool
+   */
+  public function claimScheduledCampaign(int $campaignId): bool;
+>>>>>>> d6edc5e93a1341eca53919208a0412602627170e
 }

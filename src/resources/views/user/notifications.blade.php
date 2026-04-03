@@ -65,9 +65,16 @@
     let currentFilter = 'all';
     let isLoading = false;
 
+<<<<<<< HEAD
     loadNotifications(1, 'all', false);
 
 
+=======
+    // Load notifications
+    loadNotifications(1, 'all', false);
+
+    // Change tab
+>>>>>>> d6edc5e93a1341eca53919208a0412602627170e
     $('#notification-tabs .nav-link').on('click', function(e) {
       e.preventDefault();
       $('#notification-tabs .nav-link').removeClass('active');

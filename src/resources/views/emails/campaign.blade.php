@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 <!-- <!DOCTYPE html>
+=======
+<!DOCTYPE html>
+>>>>>>> d6edc5e93a1341eca53919208a0412602627170e
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -21,4 +25,8 @@
         </div>
     </div>
 </body>
+<<<<<<< HEAD
 </html> -->
+=======
+</html>
+>>>>>>> d6edc5e93a1341eca53919208a0412602627170e

@@ -62,4 +62,14 @@ interface CampaignRecipientsRepositoryInterface
    * Check if campaign still has pending recipients
    */
   public function hasPending($campaignId);
+<<<<<<< HEAD
+=======
+
+  /**
+   * Claim pending recipient
+   * @param int $recipientId
+   * @return bool
+   */
+  public function claimPendingRecipient(int $recipientId): bool;
+>>>>>>> d6edc5e93a1341eca53919208a0412602627170e
 }

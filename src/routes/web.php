@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CampaignSchedulingController;
@@ -8,6 +9,11 @@ use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\LocaleController;
 
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -18,6 +24,11 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Auth Routes
+|--------------------------------------------------------------------------
+*/
 
 Route::controller(LoginController::class)->group(function () {
     Route::get('/login', 'showLoginForm')->name('login');
@@ -25,39 +36,55 @@ Route::controller(LoginController::class)->group(function () {
     Route::post('/logout', 'logout')->name('logout');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Admin Routes
+|--------------------------------------------------------------------------
+*/
+
 Route::prefix('admin')
     ->middleware(['auth', 'role:admin'])
     ->as('admin.')
     ->group(function () {
 
-        // Dashboard
         Route::get('/dashboard', [AdminController::class, 'dashboard'])
             ->name('dashboard');
 
-        // Campaign Scheduling (RESTful)
-        Route::controller(CampaignSchedulingController::class)->group(function () {
-            Route::get('/campaigns', 'index')->name('campaigns.index');
-            Route::post('/campaigns', 'store')->name('campaigns.store');
-        });
+        Route::get('/campaign-scheduling', [CampaignSchedulingController::class, 'index'])
+            ->name('campaigns.index');
 
-        // Subscribers
-        Route::controller(SubscriberController::class)->group(function () {
-            Route::get('/subscribers/search', 'search')->name('subscribers.search');
-        });
-});
-// route language switch
-Route::put('/locale', [LocaleController::class, 'update'])
-    ->name('locale.update');
+        Route::post('/campaign-scheduling', [CampaignSchedulingController::class, 'store'])
+            ->name('campaigns.store');
+
+        Route::get('/subscribers/search', [SubscriberController::class, 'search'])
+            ->name('subscribers.search');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| User Routes
+|--------------------------------------------------------------------------
+*/
 
 Route::middleware(['auth', 'role:user'])->group(function () {
 
-    // Notification page
     Route::get('/notifications', [NotificationController::class, 'index'])
         ->name('notifications.index');
 
-    Route::prefix('api/user/notifications')
-        ->as('api.user.notifications.')
-        ->group(function () {
+});
+
+/*
+|--------------------------------------------------------------------------
+| User API Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('api/user')
+    ->middleware(['auth', 'role:user'])
+    ->name('api.user.')
+    ->group(function () {
+
+        Route::prefix('notifications')->name('notifications.')->group(function () {
 
             Route::get('/', [NotificationController::class, 'list'])->name('list');
             Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('unread-count');
@@ -68,4 +95,14 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 
             Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
         });
-});
+
+    });
+
+/*
+|--------------------------------------------------------------------------
+| Locale Switch
+|--------------------------------------------------------------------------
+*/
+
+Route::put('/locale', [LocaleController::class, 'update'])
+    ->name('locale.update');
