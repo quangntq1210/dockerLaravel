@@ -61,7 +61,7 @@
     </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
     <script>
         $(function() {
             let currentPage = 1;
@@ -298,4 +298,4 @@
             }
         });
     </script>
-@endsection
+@endpush

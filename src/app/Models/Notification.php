@@ -9,7 +9,6 @@ class Notification extends Model
 {
     use HasFactory;
 
-    // Cho phép các trường này được chèn dữ liệu nhanh
     protected $fillable = [
         'user_id',
         'campaign_id',
@@ -18,13 +17,13 @@ class Notification extends Model
         'read_at'
     ];
 
-    // Ép kiểu read_at về dạng datetime để dễ xử lý với Carbon
     protected $casts = [
         'read_at' => 'datetime',
     ];
 
     /**
-     * Mỗi thông báo thuộc về một User (người nhận)
+     * Get the user for the notification.
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToUser
      */
     public function user()
     {
@@ -32,7 +31,8 @@ class Notification extends Model
     }
 
     /**
-     * Một thông báo có thể bắt nguồn từ một Chiến dịch (Campaign) cụ thể
+     * Get the campaign for the notification.
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToCampaign
      */
     public function campaign()
     {
@@ -40,7 +40,9 @@ class Notification extends Model
     }
 
     /**
-     * Scope để lọc nhanh các thông báo chưa đọc
+     * Scope to get unread notifications.
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeUnread($query)
     {

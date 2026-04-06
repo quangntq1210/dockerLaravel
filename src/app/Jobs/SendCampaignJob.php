@@ -27,14 +27,6 @@ class SendCampaignJob implements ShouldQueue
         $this->recipient = $recipient;
     }
 
-    /**
-     * Handle the job.
-     *
-     * @param NotificationRepositoryInterface $notifRepo
-     * @param CampaignRecipientsRepositoryInterface $recipientRepo
-     * @param CampaignRepositoryInterface $campaignRepo
-     * @return void
-     */
     public function handle(
         NotificationRepositoryInterface $notifRepo,
         CampaignRecipientsRepositoryInterface $recipientRepo,
@@ -88,28 +80,25 @@ class SendCampaignJob implements ShouldQueue
         });
     }
 
-    /**
-     * Handle the job failure.
-     *
-     * @param \Throwable $exception
-     * @return void
-     */
     public function failed(\Throwable $exception)
     {
         $recipientRepo = app(CampaignRecipientsRepositoryInterface::class);
-        $campaignRepo = app(CampaignRepositoryInterface::class);
+        $campaignRepo  = app(CampaignRepositoryInterface::class);
+
         $recipient = $recipientRepo->getById($this->recipient->id);
+
         if (!$recipient) {
             return;
         }
 
         $recipientRepo->update(['status' => 'failed'], $recipient->id);
+
         Log::error('SendCampaignJob failed', [
-            'campaign_id' => $recipient->campaign_id,
+            'campaign_id'   => $recipient->campaign_id,
             'subscriber_id' => $recipient->subscriber_id,
-            'recipient_id' => $recipient->id,
-            'attempt' => $this->attempts(),
-            'error' => $exception->getMessage(),
+            'recipient_id'  => $recipient->id,
+            'attempt'       => $this->attempts(),
+            'error'         => $exception->getMessage(),
         ]);
 
         if (!$recipientRepo->hasPending($recipient->campaign_id)) {

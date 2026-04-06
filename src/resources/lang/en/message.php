@@ -86,4 +86,6 @@ return [
   "pending_jobs" => "Pending Jobs",
   "sent_notifications" => "Sent Notifications",
   "change_language" => "Change Language",
+  "vi" => "Tiếng Việt",
+  "en" => "English",
 ];

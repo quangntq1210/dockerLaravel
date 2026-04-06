@@ -6,8 +6,8 @@ use App\Jobs\SendCampaignJob;
 use App\Repositories\Interfaces\CampaignRecipientsRepositoryInterface;
 use App\Repositories\Interfaces\CampaignRepositoryInterface;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+
 
 class DispatchCampaignCommand extends Command
 {
@@ -69,3 +69,4 @@ class DispatchCampaignCommand extends Command
         Cache::forget('admin.dashboard.stats');
     }
 }
+

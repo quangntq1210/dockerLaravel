@@ -86,4 +86,6 @@ return [
   "pending_jobs" => "Công việc đang chờ",
   "sent_notifications" => "Thông báo đã gửi",
   "change_language" => "Thay đổi ngôn ngữ",
+  "vi" => "Tiếng Việt",
+  "en" => "English",
 ];

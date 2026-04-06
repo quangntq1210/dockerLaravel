@@ -23,7 +23,7 @@ class CampaignMail extends Mailable
 
     public function build()
     {
-        return $this->subject($this->campaign->title)
+        return $this->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'))->subject($this->campaign->title)
             ->view('emails.campaign');
     }
 }

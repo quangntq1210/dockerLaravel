@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,6 +10,13 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    const ROLE_USER = 'user';
+    const ROLE_ADMIN = 'admin';
+    const ROLES = [
+        self::ROLE_USER,
+        self::ROLE_ADMIN
+    ];
+    
     /**
      * The attributes that are mass assignable.
      *

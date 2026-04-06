@@ -170,24 +170,39 @@
   });
 
   function searchSubscribers(q) {
-    $('#search-results').show().html('<small class="text-muted">{{ __('message.searching') }}</small>');
-    $.get(@js(route('admin.subscribers.search'))), {
-      q
-    }, function(data) {
+    $('#search-results')
+      .show()
+      .html('<small class="text-muted">{{ __("message.searching") }}</small>');
+
+    $.get(@js(route('admin.subscribers.search')), { q: q }, function (data) {
       if (!data.length) {
-        $('#search-results').html('<small class="text-muted">{{ __('message.no_results_found') }}</small>');
+        $('#search-results').html('<small class="text-muted">{{ __("message.no_results_found") }}</small>');
         return;
       }
+
       let html = '';
+
       data.forEach(sub => {
-        const disabled = selectedIds.has(sub.id) ? 'text-muted' : 'text-primary';
-        html += `<div class="subscriber-item d-flex justify-content-between align-items-center py-1 px-2 border-bottom"
-                              style="cursor:pointer"
-                              data-id="${sub.id}" data-name="${sub.name}" data-email="${sub.email}">
-                            <span>${sub.name} <small class="text-muted">(${sub.email})</small></span>
-                            <span class="${disabled} small">${selectedIds.has(sub.id) ? '✓ {{ __('message.selected') }}' : '+ {{ __('message.add') }}'}</span>
-                         </div>`;
+        const isSelected = selectedIds.has(sub.id);
+        const disabledClass = isSelected ? 'text-muted' : 'text-primary';
+
+        html += `
+          <div class="subscriber-item d-flex justify-content-between align-items-center py-1 px-2 border-bottom"
+              style="cursor:pointer"
+              data-id="${sub.id}" 
+              data-name="${sub.name}" 
+              data-email="${sub.email}">
+            <span>
+              ${sub.name} 
+              <small class="text-muted">(${sub.email})</small>
+            </span>
+            <span class="${disabledClass} small">
+              ${isSelected ? '✓ {{ __("message.selected") }}' : '+ {{ __("message.add") }}'}
+            </span>
+          </div>
+        `;
       });
+
       $('#search-results').html(html);
     });
   }
