@@ -1,65 +1,118 @@
-      body {
-          background-color: #f8f9fa;
-      }
+body {
+    background-color: #f0f2f5;
+    /* Màu nền xám cực nhẹ để các card nổi bật hơn */
+    font-family: 'Inter', sans-serif;
+    /* Gợi ý dùng font Inter cho hiện đại */
+}
 
-      .sidebar {
-          background: #212529;
-          color: white;
-          padding-top: 20px;
-      }
+/* SIDEBAR TỔNG THỂ */
+.sidebar {
+    background: #1a1d21;
+    /* Đen sâu hơn một chút tạo vẻ sang trọng */
+    color: #ffffff;
+    padding: 24px 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh;
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+}
 
-      .sidebar h4 {
-          font-size: 1.2rem;
-      }
+.sidebar h4 {
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    color: #0d6efd;
+    /* Màu thương hiệu chính */
+}
 
-      .sidebar a {
-          color: #adb5bd;
-          text-decoration: none;
-          padding: 10px 20px;
-          display: block;
-          border-radius: 5px;
-      }
+/* MENU LINKS */
+.sidebar a {
+    color: #9da5b1;
+    text-decoration: none;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    /* Khoảng cách icon và chữ */
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 5px;
+    font-weight: 500;
+}
 
-      .sidebar a:hover {
-          background: #343a40;
-          color: white;
-      }
+/* HIỆU ỨNG HOVER SANG TRỌNG */
+.sidebar a:hover {
+    background: rgba(13, 110, 253, 0.1);
+    /* Nền xanh nhạt trong suốt */
+    color: #3d8bfd;
+    transform: translateX(5px);
+    /* Nhích nhẹ sang phải */
+}
 
-      .language-switcher {
-          margin-top: 20px;
-          padding: 0 20px;
+/* TRẠNG THÁI ACTIVE (Khi đang ở trang đó) */
+.sidebar a.active {
+    background: #0d6efd;
+    color: white;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
 
-      }
+/* LANGUAGE SWITCHER */
+.language-switcher {
+    margin-top: auto;
+    padding: 20px 10px;
+    border-top: 1px solid #2d3238;
+}
 
-      .card-stat {
-          border: none;
-          border-radius: 10px;
-          transition: 0.3s;
-      }
+.language-switcher select {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background-color: #252a30;
+    color: #e9ecef;
+    border: 1px solid #3d444d;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    appearance: none;
+    /* Ẩn mũi tên mặc định để custom hoặc dùng icon */
+}
 
-      .card-stat:hover {
-          transform: translateY(-5px);
-      }
+.language-switcher select:hover {
+    border-color: #6c757d;
+}
 
-      .sidebar {
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          height: 100vh;
-      }
+.language-switcher select:focus {
+    outline: none;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
 
-      .language-switcher {
-          padding: 10px 20px;
-          border-radius: 22px;
+/* STATISTIC CARDS (Các ô con số ở Dashboard) */
+.card-stat {
+    border: none;
+    background: #ffffff;
+    border-radius: 16px;
+    /* Bo góc lớn hơn nhìn hiện đại hơn */
+    padding: 20px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+}
 
-      }
+.card-stat:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
 
-      .language-switcher select {
-          width: 100%;
-          max-width: 180px;
-          border-radius: 8px;
-          background-color: #20262e;
-          color: #ffffff;
-          border-color: #8a8a8ac7;
-          cursor: pointer;
-      }
+/* Tùy chỉnh thanh cuộn nếu sidebar quá dài */
+.sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #343a40;
+    border-radius: 10px;
+}
