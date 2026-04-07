@@ -15,5 +15,6 @@ return [
     'subscriber' => 'Người Đăng Ký',
     'report' => 'Báo cáo Campaign',
     'filter' => 'Lọc dữ liệu',
+    
 
 ];

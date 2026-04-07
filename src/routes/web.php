@@ -1,13 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CampaignSchedulingController;
 use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\AddNewCampaignController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,8 +24,8 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::put('/locale', [LocaleController::class, 'update'])
-    ->name('locale.update');
+// Cập nhật ngôn ngữ
+Route::put('/locale', [LocaleController::class, 'update'])->name('locale.update');
 
 /*
 |--------------------------------------------------------------------------
@@ -39,18 +39,27 @@ Route::controller(LoginController::class)->group(function () {
     Route::post('/logout', 'logout')->name('logout');
 });
 
-
 /*
 |--------------------------------------------------------------------------
-| Admin Routes
+| Admin Routes (Prefix 'admin' đã bao gồm cho tất cả route bên trong)
 |--------------------------------------------------------------------------
 */
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+    
+    // Dashboard chính
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    
+    // Quản lý lịch trình chiến dịch (Campaign Scheduling)
     Route::get('/campaign-scheduling', [CampaignSchedulingController::class, 'index'])->name('admin.campaign-scheduling');
     Route::post('/campaign-scheduling', [CampaignSchedulingController::class, 'store'])->name('admin.campaign-scheduling.store');
+    
+    // Tìm kiếm Subscriber (AJAX)
     Route::get('/subscribers/search', [SubscriberController::class, 'search'])->name('admin.subscribers.search');
+    
+    // Tạo chiến dịch mới từ Modal (AJAX)
+    // URL thực tế: http://localhost:8088/admin/campaigns/store
+    Route::post('/campaigns/store', [AddNewCampaignController::class, 'store'])->name('admin.campaigns.store');
 });
 
 /*
@@ -60,8 +69,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 */
 
 Route::middleware(['auth', 'role:user'])->group(function () {
-    Route::get('/notifications', [NotificationController::class, 'index'])
-        ->name('notifications.index');
+    
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
 
     Route::prefix('api/user')->group(function () {
         Route::get('/notifications', [NotificationController::class, 'list'])->name('api.user.notifications.list');
