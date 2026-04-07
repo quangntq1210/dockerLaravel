@@ -13,15 +13,12 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class SendCampaignJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    public $tries = 3;
-    public $backoff = [10, 20, 30];
 
     public $recipient;
 
@@ -44,46 +41,43 @@ class SendCampaignJob implements ShouldQueue
             return;
         }
 
-        DB::beginTransaction();
+        DB::transaction(function () use ($recipient, $campaign, $subscriber, $notifRepo, $recipientRepo, $campaignRepo) {
+            try {
+                Mail::to($subscriber->email)->send(new CampaignMail($campaign, $subscriber));
 
-        try {
-            Mail::to($subscriber->email)->send(
-                new CampaignMail($campaign, $subscriber)
-            );
+                if (count(Mail::failures()) > 0) {
+                    throw new \RuntimeException('SMTP reported failures: ' . implode(',', Mail::failures()));
+                }
 
-            if ($subscriber->user_id) {
-                $notifRepo->create([
-                    'user_id'     => $subscriber->user_id,
-                    'campaign_id' => $campaign->id,
-                    'title'       => $campaign->title,
-                    'message'     => $campaign->body,
+                if ($subscriber->user_id) {
+                    $notifRepo->create([
+                        'user_id'     => $subscriber->user_id,
+                        'campaign_id' => $campaign->id,
+                        'title'       => $campaign->title,
+                        'message'     => $campaign->body,
+                    ]);
+                }
+
+                $recipientRepo->update([
+                    'status'  => 'sent',
+                    'sent_at' => now(),
+                ], $recipient->id);
+
+                if (!$recipientRepo->hasPending($campaign->id)) {
+                    $campaignRepo->update(['status' => 'sent'], $campaign->id);
+                }
+            } catch (\Throwable $e) {
+                Log::warning('SendCampaignJob handle failed', [
+                    'campaign_id'   => $recipient->campaign_id,
+                    'subscriber_id' => $recipient->subscriber_id,
+                    'recipient_id'  => $recipient->id,
+                    'attempt'       => $this->attempts(),
+                    'error'         => $e->getMessage(),
                 ]);
+
+                throw $e;
             }
-
-            $recipientRepo->update([
-                'status'  => 'sent',
-                'sent_at' => now(),
-            ], $recipient->id);
-
-            if (!$recipientRepo->hasPending($campaign->id)) {
-                $campaignRepo->update(['status' => 'sent'], $campaign->id);
-            }
-
-            DB::commit();
-
-        } catch (\Throwable $e) {
-            DB::rollBack();
-
-            Log::warning('SendCampaignJob handle failed', [
-                'campaign_id'   => $recipient->campaign_id,
-                'subscriber_id' => $recipient->subscriber_id,
-                'recipient_id'  => $recipient->id,
-                'attempt'       => $this->attempts(),
-                'error'         => $e->getMessage(),
-            ]);
-
-            throw $e;
-        }
+        });
     }
 
     public function failed(\Throwable $exception)

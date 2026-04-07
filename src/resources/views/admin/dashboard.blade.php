@@ -73,25 +73,10 @@
 @endsection
 
 @push('scripts')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
+<!-- <script>
 $(document).ready(function () {
 
-    function handleDashboardResponse(response) {
-        $('#campaignTable').html(response.table);
-
-        if (response.stats) {
-            $('#total-campaigns').text(response.stats.total_campaigns);
-            $('#total-subscribers').text(response.stats.total_subscribers);
-        }
-        if (response.lang) {
-            applyLanguage(response.lang);
-        }
-    }
-
-    loadInitialLang();
-
-    $('#filterForm').on('submit', function (e) {
+    $('#filterForm').on('submit', function(e) {
         e.preventDefault();
         $.ajax({
             url: $(this).attr('action'),
@@ -114,50 +99,17 @@ $(document).ready(function () {
             }
         });
     });
-
-    $('#languageSwitcher').on('change', function () {
-        let locale = $(this).val();
-        $.ajax({
-            url: "{{ route('locale.update') }}",
-            method: "PUT",
-            data: {
-                locale: locale,
-                _token: "{{ csrf_token() }}"
-            },
-            success: function (response) {
-                handleDashboardResponse(response);
-            }
-        });
-    });
-
 });
+</script>
+@endpush -->
+@push('scripts')
+<script src="{{ asset('js/dashboard-manager.js') }}"></script> <script>
+$(document).ready(function () {
 
-function applyLanguage(lang) {
-    $('[data-lang]').each(function () {
-        let key = $(this).data('lang');
-        let keys = key.split('.');
-        let value = lang;
-        keys.forEach(k => { if (value) value = value[k]; });
-        if (value) $(this).text(value);
+    DashboardManager.init({
+        localeUpdateUrl: "{{ route('locale.update') }}",
+        csrfToken: "{{ csrf_token() }}"
     });
-}
-
-function loadInitialLang() {
-    let locale = $('#languageSwitcher').val();
-    $.ajax({
-        url: "{{ route('locale.update') }}",
-        type: "POST",
-        data: {
-            locale: locale,
-            _token: "{{ csrf_token() }}",
-            _method: "PUT"
-        },
-        success: function (response) {
-            applyLanguage(response.lang);
-        }
-    });
-}
+});
 </script>
 @endpush
-
-     

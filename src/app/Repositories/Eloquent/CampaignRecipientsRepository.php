@@ -19,10 +19,13 @@ class CampaignRecipientsRepository implements CampaignRecipientsRepositoryInterf
   }
 
   /*
+  * Create new campaign recipients
+  * @param array $data
   * @return bool
   */
   public function createBulk(array $data)
   {
+    return CampaignRecipient::insert($data);
   }
 
   /*

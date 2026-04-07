@@ -6,15 +6,12 @@ use App\Jobs\SendCampaignJob;
 use App\Repositories\Interfaces\CampaignRecipientsRepositoryInterface;
 use App\Repositories\Interfaces\CampaignRepositoryInterface;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
 
 class DispatchCampaignCommand extends Command
 {
     protected $signature = 'campaigns:dispatch';
-
-    protected $description = 'Dispatch jobs for campaigns that are scheduled and due to send';
 
     protected $campaignRepo;
     protected $recipientRepo;
@@ -45,42 +42,31 @@ class DispatchCampaignCommand extends Command
         $campaigns = $this->campaignRepo->getScheduledDue();
 
         if ($campaigns->isEmpty()) {
-            $this->info('No campaigns to dispatch.');
+            $this->info(__('message.campaigns_dispatch_empty'));
             return;
         }
 
         foreach ($campaigns as $campaign) {
-            $this->campaignRepo->update(['status' => 'processing'], $campaign->id);
+            if (!$this->campaignRepo->claimScheduledCampaign($campaign->id)) {
+                return;
+            }
 
             $recipients = $this->recipientRepo->getPendingByCampaignId($campaign->id);
 
+            $dispatched = 0;
             foreach ($recipients as $recipient) {
+                if (!$this->recipientRepo->claimPendingRecipient($recipient->id)) {
+                    continue;
+                }
+
                 SendCampaignJob::dispatch($recipient);
+                $dispatched++;
             }
 
-            $this->info("Dispatched {$recipients->count()} jobs for campaign [{$campaign->id}] \"{$campaign->title}\".");
-        }
-            DB::transaction(function () use ($campaign) {
-                if (!$this->campaignRepo->claimScheduledCampaign($campaign->id)) {
-                    return;
-                }
-
-                $recipients = $this->recipientRepo->getPendingByCampaignId($campaign->id);
-
-                $dispatched = 0;
-                foreach ($recipients as $recipient) {
-                    if (!$this->recipientRepo->claimPendingRecipient($recipient->id)) {
-                        continue;
-                    }
-
-                    SendCampaignJob::dispatch($recipient);
-                    $dispatched++;
-                }
-
-                $this->info("Dispatched {$dispatched} jobs for campaign [{$campaign->id}] \"{$campaign->title}\".");
-            });
+            $this->info("Dispatched {$dispatched} jobs for campaign [{$campaign->id}] \"{$campaign->title}\".");
         }
 
         Cache::forget('admin.dashboard.stats');
     }
+}
 

@@ -7,7 +7,7 @@ interface NotificationRepositoryInterface
     /**
      * Get user notifications with pagination
      */
-    public function getUserNotifications($userId, $perPage = 20, $page = 1);
+    public function getUserNotifications($userId, $perPage = 20, $page = 1, bool $unreadOnly = false);
 
     /**
      * Get unread count of user

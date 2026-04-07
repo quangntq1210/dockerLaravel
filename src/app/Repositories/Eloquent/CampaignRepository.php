@@ -92,9 +92,10 @@ class CampaignRepository implements CampaignRepositoryInterface
       ->get();
   }
 
+
   /**
    * Get campaigns that are draft and created_at descending
-   * @return Collection
+   * @return \Illuminate\Support\Collection
    */
   public function getDraftAndCreatedAtDescending()
   {

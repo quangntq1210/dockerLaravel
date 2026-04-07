@@ -24,6 +24,9 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::put('/locale', [LocaleController::class, 'update'])
+    ->name('locale.update');
+
 /*
 |--------------------------------------------------------------------------
 | Auth Routes
@@ -36,29 +39,19 @@ Route::controller(LoginController::class)->group(function () {
     Route::post('/logout', 'logout')->name('logout');
 });
 
+
 /*
 |--------------------------------------------------------------------------
 | Admin Routes
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('admin')
-    ->middleware(['auth', 'role:admin'])
-    ->as('admin.')
-    ->group(function () {
-
-        Route::get('/dashboard', [AdminController::class, 'dashboard'])
-            ->name('dashboard');
-
-        Route::get('/campaign-scheduling', [CampaignSchedulingController::class, 'index'])
-            ->name('campaigns.index');
-
-        Route::post('/campaign-scheduling', [CampaignSchedulingController::class, 'store'])
-            ->name('campaigns.store');
-
-        Route::get('/subscribers/search', [SubscriberController::class, 'search'])
-            ->name('subscribers.search');
-    });
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/campaign-scheduling', [CampaignSchedulingController::class, 'index'])->name('admin.campaign-scheduling');
+    Route::post('/campaign-scheduling', [CampaignSchedulingController::class, 'store'])->name('admin.campaign-scheduling.store');
+    Route::get('/subscribers/search', [SubscriberController::class, 'search'])->name('admin.subscribers.search');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -67,42 +60,15 @@ Route::prefix('admin')
 */
 
 Route::middleware(['auth', 'role:user'])->group(function () {
-
     Route::get('/notifications', [NotificationController::class, 'index'])
         ->name('notifications.index');
 
-});
-
-/*
-|--------------------------------------------------------------------------
-| User API Routes
-|--------------------------------------------------------------------------
-*/
-
-Route::prefix('api/user')
-    ->middleware(['auth', 'role:user'])
-    ->name('api.user.')
-    ->group(function () {
-
-        Route::prefix('notifications')->name('notifications.')->group(function () {
-
-            Route::get('/', [NotificationController::class, 'list'])->name('list');
-            Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('unread-count');
-
-            Route::put('/read-all', [NotificationController::class, 'markAllAsRead'])->name('read-all');
-            Route::put('/{id}/read', [NotificationController::class, 'markAsRead'])->name('read');
-            Route::put('/{id}/unread', [NotificationController::class, 'markAsUnread'])->name('unread');
-
-            Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
-        });
-
+    Route::prefix('api/user')->group(function () {
+        Route::get('/notifications', [NotificationController::class, 'list'])->name('api.user.notifications.list');
+        Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('api.user.notifications.unread-count');
+        Route::put('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('api.user.notifications.read-all');
+        Route::put('/notifications/read/{id?}', [NotificationController::class, 'markAsRead'])->name('api.user.notifications.read');
+        Route::put('/notifications/unread/{id?}', [NotificationController::class, 'markAsUnread'])->name('api.user.notifications.unread');
+        Route::delete('/notifications/{id?}', [NotificationController::class, 'destroy'])->name('api.user.notifications.destroy');
     });
-
-/*
-|--------------------------------------------------------------------------
-| Locale Switch
-|--------------------------------------------------------------------------
-*/
-
-Route::put('/locale', [LocaleController::class, 'update'])
-    ->name('locale.update');
+});
