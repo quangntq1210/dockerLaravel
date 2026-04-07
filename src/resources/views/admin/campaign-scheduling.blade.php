@@ -217,7 +217,6 @@
     selectedIds.add(id);
     $('#empty-hint').hide();
 
-    // Add tag to display
     $('#selected-subscribers').append(
       `<span class="badge bg-primary d-flex align-items-center gap-1" id="tag-${id}">
                 ${name}
@@ -226,12 +225,12 @@
              </span>`
     );
 
-    // Add hidden input
+ 
     $('#subscriber-inputs').append(
       `<input type="hidden" name="subscriber_ids[]" value="${id}" id="input-${id}">`
     );
 
-    // Update search results
+  
     $(`[data-id="${id}"] span:last`).removeClass('text-primary').addClass('text-muted').text('✓ {{ __('message.selected') }}');
   });
 
