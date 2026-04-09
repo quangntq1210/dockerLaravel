@@ -2,29 +2,29 @@
 
 namespace App\Repositories\Interfaces;
 
-interface SubscriberRepositoryInterface
+interface UserRepositoryInterface
 {
   /**
-   * Create new subscriber
+   * Create new user
    * @param array $data
    * @return \Illuminate\Database\Eloquent\Model
    */
   public function create(array $data);
 
   /**
-   * Get all subscribers
+   * Get all user
    * @return \Illuminate\Database\Eloquent\Collection
    */
   public function getAll();
 
   /**
-   * Get total subscribers
+   * Get total user
    * @return int
    */
   public function getTotal();
 
   /**
-   * Search subscribers by name or email
+   * Search user by name or email
    * @param string $query
    * @param int $limit
    * @return \Illuminate\Database\Eloquent\Collection
@@ -32,16 +32,16 @@ interface SubscriberRepositoryInterface
   public function search(string $query, int $limit = 20);
 
   /**
-   * Get subscriber by user ID
+   * Get user by user ID
    * @param $userId
-   * @return \App\Models\Subscriber | null
+   * @return \App\Models\User | null
    */
   public function getByUserId($userId);
 
   /**
-   * First or create subscriber
+   * First or create user
    * @param array $data
-   * @return \Illuminate\Database\Eloquent\Model
+   * @return \App\Models\User
    */
   public function firstOrCreate(array $data);
 }

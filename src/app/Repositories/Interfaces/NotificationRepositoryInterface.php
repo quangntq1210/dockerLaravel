@@ -54,4 +54,11 @@ interface NotificationRepositoryInterface
      * @return int
      */
     public function getTotal();
+
+    /**
+     * Create bulk notifications
+     * @param array $data
+     * @return bool
+     */
+    public function createBulk($data);
 }

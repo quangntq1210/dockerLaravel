@@ -112,4 +112,14 @@ class NotificationRepository implements NotificationRepositoryInterface
     {
         return Notification::count();
     }
+
+    /**
+     * Create bulk notifications
+     * @param array $data
+     * @return bool
+     */
+    public function createBulk($data)
+    {
+        return Notification::insert($data);
+    }
 }

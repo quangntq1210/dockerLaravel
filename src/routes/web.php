@@ -8,6 +8,9 @@ use App\Http\Controllers\CampaignSchedulingController;
 use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\CampaignController;
+use App\Http\Controllers\CampaignRecipientController;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,14 +18,8 @@ use App\Http\Controllers\LocaleController;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    if (auth()->check()) {
-        return auth()->user()->role === 'admin'
-            ? redirect()->route('admin.dashboard')
-            : redirect()->route('notifications.index');
-    }
-    return redirect()->route('login');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::post('/subscribe', [HomeController::class, 'store'])->name('home.store');
 
 Route::put('/locale', [LocaleController::class, 'update'])
     ->name('locale.update');
@@ -60,6 +57,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 */
 
 Route::middleware(['auth', 'role:user'])->group(function () {
+    Route::get('/campaigns-draft', [CampaignController::class, 'getCampaignsDraft'])
+        ->name('campaigns.draft');
+    Route::post('/campaigns-recipients', [CampaignRecipientController::class, 'storeBulk'])
+        ->name('campaigns.recipients.store.bulk');
     Route::get('/notifications', [NotificationController::class, 'index'])
         ->name('notifications.index');
 
@@ -72,3 +73,5 @@ Route::middleware(['auth', 'role:user'])->group(function () {
         Route::delete('/notifications/{id?}', [NotificationController::class, 'destroy'])->name('api.user.notifications.destroy');
     });
 });
+
+require __DIR__.'/auth.php';

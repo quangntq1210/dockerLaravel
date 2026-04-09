@@ -2,49 +2,49 @@
 
 namespace App\Repositories\Eloquent;
 
-use App\Repositories\Interfaces\SubscriberRepositoryInterface;
-use App\Models\Subscriber;
+use App\Repositories\Interfaces\UserRepositoryInterface;
+use App\Models\User;
 
-class SubscriberRepository implements SubscriberRepositoryInterface
+class UserRepository implements UserRepositoryInterface
 {
 
   /**
-   * Create new subscriber 
+   * Create new users 
    * @param array $data
-   * @return Subscriber
+   * @return User
    */
   public function create(array $data)
   {
-    return Subscriber::create($data);
+    return User::create($data);
   }
 
   /**
-   * Get all subscribers
+   * Get all users
    * @return Collection
    */
   public function getAll()
   {
-    return Subscriber::all();
+    return User::all();
   }
 
   /**
-   * Get total subscribers
+   * Get total users
    * @return int
    */
   public function getTotal()
   {
-    return Subscriber::count();
+    return User::count();
   }
 
   /**
-   * Search subscribers by name or email
+   * Search users by name or email
    * @param string $query
    * @param int $limit
    * @return \Illuminate\Database\Eloquent\Collection
    */
   public function search(string $query, int $limit = 20)
   {
-    return Subscriber::where('name', 'like', "%{$query}%")
+    return User::where('name', 'like', "%{$query}%")
       ->orWhere('email', 'like', "%{$query}%")
       ->orderBy('name')
       ->limit($limit)
@@ -52,22 +52,22 @@ class SubscriberRepository implements SubscriberRepositoryInterface
   }
 
   /**
-   * Check if subscriber exists by user ID
+   * Check if users exists by user ID
    * @param $userId
-   * @return Subscriber | null
+   * @return User | null
    */
   public function getByUserId($userId)
   {
-    return Subscriber::where('user_id', $userId)->first();
+    return User::where('user_id', $userId)->first();
   }
 
   /**
-   * First or create subscriber
+   * First or create users
    * @param array $data
-   * @return Subscriber
+   * @return User
    */
   public function firstOrCreate(array $data)
   {
-    return Subscriber::firstOrCreate($data);
+    return User::firstOrCreate($data);
   }
 }
