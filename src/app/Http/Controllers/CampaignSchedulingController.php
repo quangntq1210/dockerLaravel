@@ -4,72 +4,67 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\CampaignSchedulingRequest;
-use App\Http\Services\CampaignSchedulingService;
-use App\Http\Controllers\ApiController;
+use App\Repositories\Interfaces\CampaignRepositoryInterface;
+use App\Repositories\Interfaces\CampaignRecipientsRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 class CampaignSchedulingController extends Controller
 {
-    protected $campaignSchedulingService;
+    protected $campaignRepo;
+    protected $campaignRecipientsRepo;
 
-    /**
-     * Constructor
-     * @param CampaignSchedulingService $campaignSchedulingService
-     */
-    public function __construct(CampaignSchedulingService $campaignSchedulingService)
-    {
-        $this->campaignSchedulingService = $campaignSchedulingService;
+    public function __construct(
+        CampaignRepositoryInterface $campaignRepo,
+        CampaignRecipientsRepositoryInterface $campaignRecipientsRepo
+    ) {
+        $this->campaignRepo = $campaignRepo;
+        $this->campaignRecipientsRepo = $campaignRecipientsRepo;
     }
 
-    /**
-     * Display a listing of the campaigns that are draft and created_at descending.
-     * @return \Illuminate\Contracts\View\View
-     * @throws \Throwable
-     */
     public function index()
     {
-        try {
-            $campaigns = $this->campaignSchedulingService->getDraftAndCreatedAtDescending();
-        } catch (\Throwable $th) {
-            Log::error($th->getMessage());
-            abort(500);
-        }
+        $campaigns = $this->campaignRepo->getDraftAndCreatedAtDescending();
+
         return view('admin.campaign-scheduling', compact('campaigns'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Create a new campaign scheduling
-     * @param CampaignSchedulingRequest $request
-     * @return \Illuminate\Http\RedirectResponse
-     * @throws \Throwable
-     */
     public function store(CampaignSchedulingRequest $request)
     {
         $data = $request->validated();
 
         try {
-            $this->campaignSchedulingService->createCampaignScheduling($data);
+            DB::transaction(function () use ($data) {
+
+                $this->campaignRepo->update([
+                    'send_at' => $data['send_at'],
+                    'status'  => 'scheduled',
+                ], $data['campaign_id']);
+
+                $this->campaignRecipientsRepo->deleteByCampaignId($data['campaign_id']);
+
+                $recipients = array_map(fn($subscriberId) => [
+                    'campaign_id'   => $data['campaign_id'],
+                    'subscriber_id' => $subscriberId,
+                    'status'        => 'pending',
+                    'sent_at'       => null,
+                    'created_at'    => now(),
+                    'updated_at'    => now(),
+                ], $data['subscriber_ids']);
+
+                $this->campaignRecipientsRepo->createBulk($recipients);
+            });
 
             Cache::forget('admin.dashboard.stats');
 
             return redirect()
                 ->route('admin.campaign-scheduling')
-                ->with('success', __('message.campaign_scheduled'));
+                ->with('success', 'Đã lên lịch gửi thành công!');
+
         } catch (\Throwable $e) {
             return back()
                 ->withInput()
-                ->withErrors(['general' => __('message.error_occurred')]);
+                ->withErrors(['general' => 'Có lỗi xảy ra: ' . $e->getMessage()]);
         }
     }
 }

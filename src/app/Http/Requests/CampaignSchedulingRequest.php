@@ -36,16 +36,20 @@ class CampaignSchedulingRequest extends FormRequest
     }
 
     /**
-     * Get the validation attributes that apply to the request.
+     * Get the validation messages that apply to the request.
      *
      * @return array
      */
-    public function attributes()
+    public function messages()
     {
         return [
-            "campaign_id" => "__('validation.attributes.campaign_id')",
-            "subscriber_ids" => "__('validation.attributes.subscriber_ids')",
-            "send_at" => "__('validation.attributes.send_at')",
+            'campaign_id.required'      => 'Vui lòng chọn campaign.',
+            'campaign_id.exists'        => 'Campaign không tồn tại.',
+            'subscriber_ids.required'   => 'Vui lòng chọn ít nhất 1 người nhận.',
+            'subscriber_ids.min'        => 'Vui lòng chọn ít nhất 1 người nhận.',
+            'subscriber_ids.*.exists'   => 'Một hoặc nhiều người nhận không hợp lệ.',
+            'send_at.required'          => 'Vui lòng chọn thời gian gửi.',
+            'send_at.after'             => 'Thời gian gửi phải ở trong tương lai.',
         ];
     }
 }

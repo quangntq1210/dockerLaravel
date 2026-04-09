@@ -146,11 +146,6 @@ return [
     |
     */
 
-    'attributes' => [
-        'campaigns' => 'Campaigns',
-        'campaigns.*' => 'Campaign',
-        'name' => 'Name',
-        'email' => 'Email',
-    ],
+    'attributes' => [],
 
 ];
