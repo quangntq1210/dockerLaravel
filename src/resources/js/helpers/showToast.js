@@ -8,7 +8,7 @@ const showToast = (message, type = 'success') => {
           </div>
       </div>`;
     $('#toast-container').append(html);
-    const toast = new bootstrap.Toast(document.getElementById(id), { delay: 3000 });
+    const toast = new bootstrap.Toast(document.getElementById(id), { delay: 2000 });
     toast.show();
 }
 

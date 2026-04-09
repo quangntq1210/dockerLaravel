@@ -95,13 +95,35 @@ class CampaignRepository implements CampaignRepositoryInterface
 
   /**
    * Get campaigns that are draft and created_at descending
-   * @return \Illuminate\Support\Collection
+   * @param $subscriberId
+   * @param $perPage
+   * @param $page
+   * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
    */
-  public function getDraftAndCreatedAtDescending()
+  public function getDraftBySubscriberId($subscriberId, $perPage = 20, $page = 1)
+  {
+      $query = Campaign::where('status', 'draft')
+          ->orderBy('created_at', 'desc');
+  
+      if ($subscriberId) {
+          $query->whereDoesntHave('recipients', function ($q) use ($subscriberId) {
+              $q->where('subscriber_id', $subscriberId)
+                ->where('status', 'draft');
+          });
+      }
+  
+      return $query->paginate($perPage, ['*'], 'page', $page);
+  }
+
+  /**
+   * Get campaigns that are draft and created_at descending
+   * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+   */
+  public function getDraftAndCreatedAtDescending($perPage = 20, $page = 1)
   {
     return Campaign::where('status', 'draft')
       ->orderBy('created_at', 'desc')
-      ->get();
+      ->paginate($perPage, ['*'], 'page', $page);
   }
 
   /*

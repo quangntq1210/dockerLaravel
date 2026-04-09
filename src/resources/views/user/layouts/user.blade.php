@@ -13,7 +13,7 @@
     {{-- Navigation Bar --}}
     <nav class="navbar navbar-dark bg-dark px-4">
         <span class="navbar-brand fw-bold mb-0">{{ __('message.notification_management') }}</span>
-    
+
         <div class="d-flex align-items-center gap-3 ms-auto flex-nowrap">
             <div class="language-switcher">
                 <select id="languageSwitcher" class="form-select form-select-sm" style="width: auto; min-width: 9rem;">
@@ -38,19 +38,31 @@
         @yield('content')
     </div>
 
+    <script>
+        window.timeAgoI18n = {
+            locale: @js(app()->getLocale()),
+            just_now: @js(__('message.just_now')),
+            minutes_ago: @js(__('message.minutes_ago')),
+            hours_ago: @js(__('message.hours_ago')),
+            days_ago: @js(__('message.days_ago')),
+        };
+    </script>
+    <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{ asset('js/helpers/renderPagination.js') }}"></script>
     <script>
-        $(document).ready(function () {
-            $('#languageSwitcher').on('change', function () {
+        $(document).ready(function() {
+            $('#languageSwitcher').on('change', function() {
                 var locale = $(this).val();
-        
+
                 $.ajax({
                     url: @js(route('locale.update')),
                     type: 'PUT',
                     contentType: 'application/json',
-                    data: JSON.stringify({ locale: locale }),
-                    success: function () {
+                    data: JSON.stringify({
+                        locale: locale
+                    }),
+                    success: function() {
                         location.reload();
                     }
                 });
