@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Subscriber extends Authenticatable
@@ -14,10 +16,5 @@ class Subscriber extends Authenticatable
     public function campaigns()
     {
         return $this->belongsToMany(Campaign::class, 'campaign_recipients');
-    }
-     
-    public function user()  
-    {
-        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

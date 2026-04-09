@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Services\LocaleService;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Session;
+use App\Services\LocaleService;
 
 class LocaleController extends Controller
 {
     protected $localeService;
-
     public function __construct(LocaleService $localeService)
     {
         $this->localeService = $localeService;
@@ -19,12 +20,8 @@ class LocaleController extends Controller
         $request->validate([
             'locale' => 'required|in:vi,en'
         ]);
+        $result = $this->localeService->updateLocale($request->locale);
 
-        $payload = $this->localeService->changeLocale(
-            $request->input('locale'),
-            $request->boolean('withAdminPayload')
-        );
-        
-        return response()->json($payload);
+        return response()->json($result);
     }
 }

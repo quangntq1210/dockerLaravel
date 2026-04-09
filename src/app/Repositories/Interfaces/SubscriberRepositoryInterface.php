@@ -5,15 +5,8 @@ namespace App\Repositories\Interfaces;
 interface SubscriberRepositoryInterface
 {
   /**
-   * Create new subscriber
-   * @param array $data
-   * @return \Illuminate\Database\Eloquent\Model
-   */
-  public function create(array $data);
-
-  /**
    * Get all subscribers
-   * @return \Illuminate\Database\Eloquent\Collection
+   * @return Collection
    */
   public function getAll();
 
@@ -30,18 +23,4 @@ interface SubscriberRepositoryInterface
    * @return \Illuminate\Database\Eloquent\Collection
    */
   public function search(string $query, int $limit = 20);
-
-  /**
-   * Get subscriber by user ID
-   * @param $userId
-   * @return \App\Models\Subscriber | null
-   */
-  public function getByUserId($userId);
-
-  /**
-   * First or create subscriber
-   * @param array $data
-   * @return \Illuminate\Database\Eloquent\Model
-   */
-  public function firstOrCreate(array $data);
 }

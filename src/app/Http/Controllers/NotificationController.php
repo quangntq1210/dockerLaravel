@@ -4,25 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Repositories\Eloquent\NotificationRepository;
 use App\Http\Controllers\ApiController;
-use App\Http\Services\NotificationService;
 
 class NotificationController extends ApiController
 {
-    protected $notificationService;
+    protected $notificationRepo;
 
-    /**
-     * Constructor
-     * @param NotificationService $notificationService
-     * @return void
-     */
-    public function __construct(NotificationService $notificationService)
+    public function __construct(NotificationRepository $notificationRepo)
     {
-        $this->notificationService = $notificationService;
+        $this->notificationRepo = $notificationRepo;
     }
 
     /**
-     * View notifications
+     * Display a listing of the resource.
+     *
      * @return \Illuminate\Contracts\View\View
      */
     public function index()
@@ -31,44 +27,98 @@ class NotificationController extends ApiController
     }
 
     /**
-     * Remove notification by ID
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     *
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Throwable
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        $this->notificationService->delete($id);
-        return $this->success(__('message.notification_deleted'));
+        $notification = $this->notificationRepo->delete($id);
+        if (!$notification) {
+            return $this->error('Notification not found', 404);
+        }
+        return $this->success('Notification deleted successfully', null, null, 200);
     }
 
     /**
      * List notifications
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
-     * @throws \Throwable
      */
     public function list(Request $request): JsonResponse
     {
         $userId = auth()->id();
-        $perPage = $request->get('per_page', 10);
-        $page = $request->get('page', 1);
-        $unreadOnly = $request->boolean('unread');
-
-        $notifications = $this->notificationService->list($userId, $perPage, $page, $unreadOnly);
-
-        return $this->success(
-            __('message.notifications_fetched'),
-            $notifications->items(),
-            [
+        $notifications = $this->notificationRepo->getUserNotifications(
+            $userId,
+            $request->get('per_page', 10),
+            $request->get('page', 1),
+            $request->boolean('unread')
+        );
+        return $this->success('Notifications fetched successfully', [
+            'data' => $notifications->items(),
+            'meta' => [
                 'current_page' => $notifications->currentPage(),
                 'per_page'     => $notifications->perPage(),
-                'last_page'    => $notifications->lastPage(),
                 'total'        => $notifications->total(),
-                'unread_count' => $this->notificationService->getUnreadCount($userId),
+                'unread_count' => $this->notificationRepo->getUnreadCount($userId),
             ],
-            200
-        );
+        ]);
     }
 
     /**
@@ -78,8 +128,11 @@ class NotificationController extends ApiController
      */
     public function markAsRead($id)
     {
-        $this->notificationService->markAsRead($id);
-        return $this->success(__('message.notification_marked_as_read'), null, null, 200);
+        $notification = $this->notificationRepo->markAsRead($id);
+        if (!$notification) {
+            return $this->error('Notification not found', 404);
+        }
+        return $this->success('Notification marked as read successfully', null, null, 200);
     }
 
     /**
@@ -89,8 +142,21 @@ class NotificationController extends ApiController
      */
     public function markAsUnread($id)
     {
-        $this->notificationService->markAsUnread($id);
-        return $this->success(__('message.notification_marked_as_unread'), null, null, 200);
+        $notification = $this->notificationRepo->markAsUnread($id);
+        if (!$notification) {
+            return $this->error('Notification not found', 404);
+        }
+        return $this->success('Notification marked as unread successfully', null, null, 200);
+    }
+
+    /**
+     * Get unread count
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function unreadCount()
+    {
+        $count = $this->notificationRepo->getUnreadCount(auth()->id());
+        return $this->success('Unread count fetched successfully', $count, null, 200);
     }
 
     /**
@@ -99,8 +165,7 @@ class NotificationController extends ApiController
      */
     public function markAllAsRead()
     {
-        $userId = auth()->id();
-        $this->notificationService->markAllAsRead($userId);
-        return $this->success(__('message.notifications_marked_as_read'), null, null, 200);
+        $count = $this->notificationRepo->markAllAsRead(auth()->id());
+        return $this->success('Notifications marked as read successfully', null, null, 200);
     }
 }
