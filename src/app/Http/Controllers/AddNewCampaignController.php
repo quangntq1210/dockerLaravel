@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Services\AddNewCampaignService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\CreateCampaignRequest;
 use Exception;
 
 class AddNewCampaignController extends Controller
@@ -16,14 +17,11 @@ class AddNewCampaignController extends Controller
         $this->campaignService = $campaignService;
     }
 
-    public function store(Request $request)
+    public function store(CreateCampaignRequest $request)
     {
         try {
         
-            $validated = $request->validate([
-                'title'   => 'required|max:255',
-                'content' => 'required', 
-            ]);
+           $validated = $request->validated();
 
             $result = $this->campaignService->createCampaign($validated);
 

@@ -63,6 +63,7 @@
 
 @push('scripts')
     <script>
+        let FirstCount =0;
         $(function() {
             let currentPage = 1;
             let currentFilter = 'all';
@@ -132,8 +133,9 @@
                             $item.find('.dot-read').removeClass('bg-primary rounded-circle');
                             $item.find('.btn-toggle-read').contents().last().replaceWith(
                                 `{{ __('message.notification_mark_as_unread') }}`);
-                            let count = parseInt($('#unread-badge').text()) || 0;
-                            updateUnreadBadge(count - 1);
+                            
+                            updateUnreadBadge(FirstCount - 1);
+                            console.log("count1",FirstCount);
                         } else {
                             // Change to unread
                             $item.addClass('unread').css('background', '#e7f3ff').data('read',
@@ -141,13 +143,14 @@
                             $item.find('.dot-read').addClass('bg-primary rounded-circle');
                             $item.find('.btn-toggle-read').contents().last().replaceWith(
                                 `{{ __('message.notification_mark_as_read') }}`);
-                            let count = parseInt($('#unread-badge').text()) || 0;
-                            updateUnreadBadge(count + 1);
+                      
+                          updateUnreadBadge(FirstCount + 1);
+                           console.log("count2",FirstCount);
                         }
-                        showToast(res.message, 'success');
+                        // showToast(res.message, 'success');
                     },
                     error: function(res) {
-                        showToast(res.responseJSON.message, 'danger');
+                        // showToast(res.responseJSON.message, 'danger');
                     }
                 });
             });
@@ -290,6 +293,7 @@
 
             // Update unread badge
             function updateUnreadBadge(count) {
+                FirstCount = count;
                 if (count > 0) {
                     $('#unread-badge').text(count).show();
                 } else {
