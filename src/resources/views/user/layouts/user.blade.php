@@ -1,37 +1,75 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="{{ app()->getLocale() }}">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>Quản lý thông báo</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ __('message.notification_management') }}</title>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
 
 <body class="bg-light">
-  <nav class="navbar navbar-dark bg-dark px-4">
-    <span class="navbar-brand fw-bold">Quản lý thông báo</span>
-    <div class="d-flex align-items-center gap-3">
-      <span class="text-white">{{ auth()->user()->name }}</span>
-      <form action="/logout" method="POST">
-        @csrf
-        <button class="btn btn-outline-light btn-sm">Đăng xuất</button>
-      </form>
+    {{-- Navigation Bar --}}
+    <nav class="navbar navbar-dark bg-dark px-4">
+        <span class="navbar-brand fw-bold mb-0">{{ __('message.notification_management') }}</span>
+
+        <div class="d-flex align-items-center gap-3 ms-auto flex-nowrap">
+            <div class="language-switcher">
+                <select id="languageSwitcher" class="form-select form-select-sm" style="width: auto; min-width: 9rem;">
+                    <option value="vi" {{ app()->getLocale() == 'vi' ? 'selected' : '' }}>
+                        {{ __('message.vi') }}
+                    </option>
+                    <option value="en" {{ app()->getLocale() == 'en' ? 'selected' : '' }}>
+                        {{ __('message.en') }}
+                    </option>
+                </select>
+            </div>
+            <span class="text-white text-nowrap">{{ auth()->user()->name }}</span>
+            <form action="/logout" method="POST" class="d-flex mb-0">
+                @csrf
+                <button type="submit" class="btn btn-outline-light btn-sm">{{ __('message.logout') }}</button>
+            </form>
+        </div>
+    </nav>
+
+    {{-- Content --}}
+    <div class="container py-4">
+        @yield('content')
     </div>
-  </nav>
 
-  <div class="container py-4">
-    @yield('content')
-  </div>
+    <script>
+        window.timeAgoI18n = {
+            locale: @js(app()->getLocale()),
+            just_now: @js(__('message.just_now')),
+            minutes_ago: @js(__('message.minutes_ago')),
+            hours_ago: @js(__('message.hours_ago')),
+            days_ago: @js(__('message.days_ago')),
+        };
+    </script>
+    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('js/helpers/renderPagination.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            $('#languageSwitcher').on('change', function() {
+                var locale = $(this).val();
 
-  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="{{ asset('js/helpers/formatTimeAgo.js') }}"></script>
-  <script src="{{ asset('js/helpers/showToast.js') }}"></script>
-  <script src="{{ asset('js/helpers/renderPagination.js') }}"></script>
-  @yield('scripts')
+                $.ajax({
+                    url: @js(route('locale.update')),
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        locale: locale
+                    }),
+                    success: function() {
+                        location.reload();
+                    }
+                });
+            });
+        });
+    </script>
+    @stack('scripts')
 </body>
 
 </html>

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
@@ -17,6 +17,7 @@ class User extends Authenticatable
         self::ROLE_USER,
         self::ROLE_ADMIN
     ];
+    
     /**
      * The attributes that are mass assignable.
      *
@@ -43,4 +44,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function subscriber()
+    {
+        return $this->hasOne(Subscriber::class, 'user_id', 'id');
+    }
 }

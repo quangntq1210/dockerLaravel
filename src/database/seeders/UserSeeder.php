@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 class UserSeeder extends Seeder
 {
     /**
@@ -15,16 +14,6 @@ class UserSeeder extends Seeder
     
      public function run()
     {
-        // Tạo tài khoản Admin mẫu
-        User::updateOrCreate(
-            ['email' => 'client@gmail.com'], 
-            [
-                'name' => 'Client user',
-                'password' => Hash::make('12345678'), 
-                'role' => 'user',
-            ]
-        );
-
-     
+        User::factory(50)->create();
     }
 }

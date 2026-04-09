@@ -44,38 +44,30 @@ class NotificationRepository implements NotificationRepositoryInterface
 
     /**
      * @param int $id
-     * @return Notification|null
+     * @return void
      */
     public function markAsRead($id)
     {
-        $notification = $this->getById($id);
-        if ($notification) {
-            $notification->update(['read_at' => now()]);
-        }
-        return $notification;
+        Notification::findOrFail($id)->update(['read_at' => now()]);
     }
 
     /**
      * Mark notification as unread
-     * @param int $id
-     * @return Notification|null
+     * @param mixed $id
+     * @return void
      */
     public function markAsUnread($id)
     {
-        $notification = $this->getById($id);
-        if ($notification) {
-            $notification->update(['read_at' => null]);
-        }
-        return $notification;
+        Notification::findOrFail($id)->update(['read_at' => null]);
     }
 
     /**
      * @param int $userId
-     * @return int
+     * @return void
      */
     public function markAllAsRead($userId)
     {
-        return Notification::where('user_id', $userId)
+        Notification::where('user_id', $userId)
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
     }
@@ -90,16 +82,14 @@ class NotificationRepository implements NotificationRepositoryInterface
     }
 
     /**
+     * Delete notification by ID
      * @param int $id
-     * @return Notification|null
+     * @return bool
      */
     public function delete($id)
     {
-        $notification = $this->getById($id);
-        if ($notification) {
-            $notification->delete();
-        }
-        return $notification;
+        $notification = Notification::findOrFail($id);
+        return $notification->delete();
     }
 
     /**
@@ -121,5 +111,15 @@ class NotificationRepository implements NotificationRepositoryInterface
     public function getTotal()
     {
         return Notification::count();
+    }
+
+    /**
+     * Create bulk notifications
+     * @param array $data
+     * @return bool
+     */
+    public function createBulk($data)
+    {
+        return Notification::insert($data);
     }
 }

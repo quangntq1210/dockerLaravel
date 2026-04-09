@@ -46,9 +46,20 @@ interface CampaignRepositoryInterface
 
   /**
    * Get campaigns that are draft and created_at descending
-   * @return Collection
+   * @param $subscriberId
+   * @param $perPage
+   * @param $page
+   * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
    */
-  public function getDraftAndCreatedAtDescending();
+  public function getDraftBySubscriberId($subscriberId, $perPage = 20, $page = 1);
+
+  /**
+   * Get campaigns that are draft and created_at descending
+   * @param $perPage
+   * @param $page
+   * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+   */
+  public function getDraftAndCreatedAtDescending($perPage = 20, $page = 1);
 
   /**
    * Get total campaigns
@@ -61,8 +72,6 @@ interface CampaignRepositoryInterface
    * @return int
    */
   public function getTotalByStatus($status);
-<<<<<<< HEAD
-=======
 
   /**
    * Claim scheduled campaign
@@ -70,5 +79,4 @@ interface CampaignRepositoryInterface
    * @return bool
    */
   public function claimScheduledCampaign(int $campaignId): bool;
->>>>>>> d6edc5e93a1341eca53919208a0412602627170e
 }
