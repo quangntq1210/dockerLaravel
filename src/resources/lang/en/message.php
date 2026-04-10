@@ -117,4 +117,15 @@ return [
   'account_mail_content' => 'Your account: :email, Your password: :password',
   'login_url' => 'Login URL',
   'campaign_not_draft' => 'Campaign not found or not in draft status',
+  "create_campaign" => "Create new campaign",
+  "campaign_title" => "Campaign Title",
+  "enter_campaign_title" => "Enter your campaign title...",
+  "campaign_content" => "Campaign Content",
+  "enter_campaign_content" => "Enter your campaign content...",
+  "save_changes" => "Save",
+  "send_time" => "Send Time",
+  "saving" => "Saving...",
+  "save_success" => "Campaign saved successfully",
+  "save_error" => "Error saving campaign, please try again",
+  "save_complete" => "Save complete"
 ];

@@ -3,31 +3,41 @@
 namespace App\Http\Services;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\App; 
 use App\Repositories\Interfaces\DashboardRepositoryInterface;
-class AdminService
+use App\Repositories\Interfaces\AdminServiceInterface;
+
+class AdminService implements AdminServiceInterface
 {
     protected $dashboardRepo;
 
+    /**
+     * Constructor
+     * @param \App\Repositories\Interfaces\DashboardRepositoryInterface $dashboardRepo
+     * @return void
+     */
     public function __construct(DashboardRepositoryInterface $dashboardRepo)
     {
         $this->dashboardRepo = $dashboardRepo;
     }
 
-    public function getDashboardData($request)
+    /**
+     * Get dashboard data
+     * @param array $params
+     * @return array
+     */
+    public function getDashboardData(array $params): array
     {
-        $filters = [
-            'q' => $request->q,
-            'campaign_id' => $request->campaign_id,
-            'from' => $request->from,
-            'to' => $request->to
-        ];
+        $page = $params['page'] ?? 1;
+        $locale = App::getLocale();
+        $cacheKey = "dashboard_{$locale}_p{$page}_" . md5(json_encode($params));
 
-        $cacheKey = 'dashboard_' . md5(json_encode($filters) . request()->page);
-
-        return Cache::tags(['dashboard'])->remember($cacheKey, 300, function () use ($filters) {
+        return Cache::tags(['dashboard'])->remember($cacheKey, 300, function () use ($params) {
             return [
                 'stats' => $this->dashboardRepo->getStats(),
-                'data' => $this->dashboardRepo->getCampaignReport($filters)
+                'table' => [
+                    'items' => $this->dashboardRepo->getCampaignReport($params)
+                ]
             ];
         });
     }

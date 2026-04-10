@@ -22,6 +22,11 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">{{ __('message.create_campaign_scheduling') }}</h5>
+                    <button type="button" style="float:right" class="btn btn-light btn-sm fw-bold shadow-sm"
+                        data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        <i class="bi bi-plus-circle me-1"></i> {{ __('message.create_campaign') }}
+                    </button>
+                    @include('admin.CreateCampaign')
                 </div>
                 <div class="card-body p-4">
                     <form action="{{ route('admin.campaign-scheduling.store') }}" method="POST">

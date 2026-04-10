@@ -4,7 +4,6 @@ namespace App\Repositories\Interfaces;
 
 interface DashboardRepositoryInterface
 {
-    public function getStats();
-
-    public function getCampaignReport($filters);
+    public function getCampaignReport(array $filters);
+    public function getStats(): array;
 }

@@ -1,64 +1,231 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# Laravel Campaign & Notification System
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+Hệ thống quản lý **chiến dịch email** và **thông báo** được xây dựng trên nền tảng Laravel 8, chạy hoàn toàn trên Docker. Dự án hỗ trợ phân quyền Admin/User, lên lịch gửi email tự động, quản lý subscriber, và hệ thống notification real-time.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Tính năng chính
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| Tính năng                 | Mô tả                                                            |
+| ------------------------- | ---------------------------------------------------------------- |
+| **Xác thực & Phân quyền** | Đăng nhập/Đăng xuất với Laravel Breeze, phân quyền Admin và User |
+| **Admin Dashboard**       | Tổng quan dữ liệu hệ thống, bảng thống kê real-time (AJAX)       |
+| **Campaign Email**        | Tạo và quản lý chiến dịch gửi email hàng loạt                    |
+| **Lên lịch Campaign**     | Hẹn giờ gửi campaign tự động với Task Scheduling                 |
+| **Hệ thống Notification** | Thông báo cho user với đánh dấu đã đọc/chưa đọc, xoá             |
+| **Đa ngôn ngữ**           | Hỗ trợ Tiếng Việt và Tiếng Anh                                   |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Tech Stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| Thành phần           | Công nghệ                                   |
+| -------------------- | ------------------------------------------- |
+| **Backend**          | PHP 7.4, Laravel 8.x                        |
+| **Frontend**         | Blade Templates, Tailwind CSS, Bootstrap    |
+| **Database**         | MySQL 8.0                                   |
+| **Cache & Queue**    | Redis                                       |
+| **Web Server**       | Nginx                                       |
+| **Process Manager**  | Supervisor (Queue Worker + Schedule Runner) |
+| **Containerization** | Docker, Docker Compose                      |
+| **Authentication**   | Laravel Breeze                              |
+| **Debugging**        | Laravel Telescope                           |
+| **HTTP Client**      | Guzzle                                      |
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## Cấu trúc dự án
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+```
+dockerLaravel/
+├── docker-compose.yml          # Cấu hình Docker services
+├── Dockerfile                  # Build image PHP-FPM
+├── supervisord.conf            # Cấu hình Supervisor (queue + schedule)
+├── nginx/
+│   └── default.conf            # Cấu hình Nginx
+└── src/                        # Mã nguồn Laravel
+    ├── app/
+    │   ├── Console/
+    │   │   └── Commands/       # Artisan commands (DispatchCampaignCommand)
+    │   ├── Exceptions/         # Global exception handling
+    │   ├── Http/
+    │   │   ├── Controllers/    # Controllers (Admin, Campaign, Notification, ...)
+    │   │   ├── Middleware/      # CheckRole, SetLocale, ...
+    │   │   ├── Requests/       # Form Request validation
+    │   │   ├── Responses/      # API Response Trait
+    │   │   └── Services/       # Business logic layer
+    │   ├── Jobs/               # Queue jobs (SendCampaignJob)
+    │   ├── Mail/               # Mailable classes (CampaignMail, WelcomeMail)
+    │   ├── Models/             # Eloquent models
+    │   ├── Providers/          # Service providers
+    │   └── Repositories/       # Repository pattern
+    │       ├── Eloquent/       # Implementations
+    │       └── Interfaces/     # Contracts
+    ├── database/
+    │   └── migrations/         # Database migrations
+    │   └── factories/          # Database factories
+    │   └── seeders/            # Database seeders
+    ├── public/
+    │   └── css/                # Public css
+    │   └── js/                 # Public js
+    ├── resources/
+    │   ├── css/                # Resource css
+    │   └── js/                 # Resource js
+    │   ├── lang/               # Ngôn ngữ (en, vi)
+    │   └── views/              # Blade templates
+    │       ├── admin/          # Giao diện Admin
+    │       ├── auth/           # Giao diện xác thực
+    │       ├── emails/         # Email templates
+    │       ├── user/           # Giao diện User
+    │       └── layouts/        # Layout chung
+    ├── routes/
+    │   ├── web.php             # Web routes
+    │   └── api.php             # API routes
+    ├── composer.json
+    └── .env.example
+```
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[OP.GG](https://op.gg)**
+## Yêu cầu hệ thống
 
-## Contributing
+| Phần mềm                                                   | Phiên bản tối thiểu |
+| ---------------------------------------------------------- | ------------------- |
+| [Docker](https://docs.docker.com/get-docker/)              | 20.10+              |
+| [Docker Compose](https://docs.docker.com/compose/install/) | 2.0+                |
+| Git                                                        | 2.30+               |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+> **Không cần** cài đặt PHP, Composer, MySQL hay Redis trên máy host — tất cả đã được đóng gói trong Docker.
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Phân quyền thư mục (Linux/Ubuntu)
 
-## Security Vulnerabilities
+Nếu bạn dùng Ubuntu/Linux và gặp lỗi kiểu `Permission denied` khi ghi log/cache/session, hãy cấp quyền cho các thư mục cần ghi của Laravel:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+# Chạy tại thư mục root dự án
+sudo chown -R $USER:$USER src/storage src/bootstrap/cache
+sudo chmod -R 775 src/storage src/bootstrap/cache
+```
 
-## License
+Nếu vẫn lỗi do container ghi file bằng user `www-data`, chạy thêm trong container app:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+docker exec -it laravel_app bash -lc "chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && chmod -R 775 /var/www/storage /var/www/bootstrap/cache"
+```
 
-<!-- ## CTRL SHIFT V -->
+> Sau khi cấp quyền, thử lại:
+>
+> -   `docker compose up -d`
+> -   `docker exec -it laravel_app php artisan optimize:clear`
 
+---
+
+## Cài đặt & Khởi chạy
+
+### 1. Clone dự án
+
+```bash
+git clone https://github.com/quangntq1210/dockerLaravel.git
+cd dockerLaravel
+```
+
+### 2. Cấu hình môi trường
+
+```bash
+cp src/.env.example src/.env
+```
+
+Chỉnh sửa file `src/.env` theo cấu hình Docker (xem mục [Cấu hình môi trường](#-cấu-hình-môi-trường) bên dưới).
+
+### 3. Khởi chạy Docker containers
+
+```bash
+docker compose up -d --build
+```
+
+Lệnh này sẽ khởi tạo **5 services**:
+
+| Container        | Vai trò                  | Port            |
+| ---------------- | ------------------------ | --------------- |
+| `laravel_app`    | PHP-FPM (Application)    | 9000 (internal) |
+| `laravel_nginx`  | Web Server               | **8088** → 80   |
+| `laravel_worker` | Queue Worker + Scheduler | —               |
+| `laravel_db`     | MySQL Database           | **3307** → 3306 |
+| `laravel_redis`  | Redis Cache & Queue      | **6379**        |
+
+### 4. Cài đặt dependencies
+
+```bash
+docker exec -it laravel_app composer install
+cd src
+npm install
+npm run dev
+```
+
+### 5. Generate application key
+
+```bash
+docker exec -it laravel_app php artisan key:generate
+```
+
+### 6. Chạy database migration & seeder
+
+```bash
+docker exec -it laravel_app php artisan migrate
+```
+
+```bash
+docker exec -it laravel_app php artisan db:seed --class=DatabaseSeeder
+```
+
+### 7. Truy cập ứng dụng
+
+Mở trình duyệt và truy cập:
+
+```
+http://localhost:8088
+```
+
+---
+
+## Cấu hình môi trường
+
+Dưới đây là các biến môi trường quan trọng cần chỉnh sửa trong `src/.env` để phù hợp với Docker:
+
+```env
+APP_NAME="Campaign Manager"
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://localhost:8088
+
+# Database — khớp với docker-compose.yml
+DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=user
+DB_PASSWORD=password
+
+# Redis — khớp với docker-compose.yml
+REDIS_HOST=redis
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+# Queue sử dụng Redis
+QUEUE_CONNECTION=redis
+CACHE_DRIVER=redis
+SESSION_DRIVER=redis
+
+# Mail (sử dụng Mailtrap cho development)
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_FROM_ADDRESS=noreply@example.com
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+> **Lưu ý quan trọng:** Trong Docker, `DB_HOST` phải là `db` (tên service) và `REDIS_HOST` phải là `redis` (tên service), **không phải** `127.0.0.1`.

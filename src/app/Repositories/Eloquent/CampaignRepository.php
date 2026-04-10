@@ -15,7 +15,13 @@ class CampaignRepository implements CampaignRepositoryInterface
   */
   public function create(array $data)
   {
-    return Campaign::create($data);
+      return Campaign::create([
+          'title'      => $data['title'],
+          'body'       => $data['content'] ?? $data['body'], 
+          'status'     => $data['status'] ?? 'draft',
+          'created_by' => auth()->id() ?? 1,
+          'send_at'    => $data['send_at'] ?? now(),
+      ]);
   }
 
   /*

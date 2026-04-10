@@ -8,14 +8,12 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-    // Hiển thị form
+  
     public function showLoginForm()
     {
         return view('auth.login');
     }
 
-    // Xử lý đăng nhập
-    // Xử lý đăng nhập
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -29,13 +27,12 @@ class LoginController extends Controller
             // Lấy thông tin user vừa đăng nhập
             $user = Auth::user();
 
-            // Kiểm tra Role: Nếu là 'admin' thì vào trang quản trị
-            if ($user->role == 'admin') {
-                return redirect()->intended('/admin/dashboard');
-            }
-
-            // Nếu là 'user' hoặc role khác thì về trang chủ hoặc trang thông báo
-            return redirect()->intended('/notifications');
+   
+           if ($user->role == 'admin') {
+    return redirect()->intended(route('admin.dashboard'));
+}
+           
+           return redirect()->intended(route('notifications.index'));
         }
 
         return back()->withErrors([
@@ -43,7 +40,7 @@ class LoginController extends Controller
         ])->onlyInput('email');
     }
 
-    // Đăng xuất
+
     public function logout(Request $request)
     {
         Auth::logout();

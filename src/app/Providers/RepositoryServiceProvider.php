@@ -15,6 +15,8 @@ use App\Repositories\Interfaces\SubscriberRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Eloquent\UserRepository;
 use Illuminate\Support\ServiceProvider;
+use App\Repositories\Interfaces\AdminServiceInterface;
+use App\Http\Services\AdminService;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -53,6 +55,11 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             UserRepositoryInterface::class,
             UserRepository::class
+        );
+
+        $this->app->bind(
+            AdminServiceInterface::class,
+            AdminService::class
         );
     }
 

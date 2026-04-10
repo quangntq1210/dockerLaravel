@@ -13,7 +13,11 @@ return [
     |
     */
 
-    'failed' => 'These credentials do not match our records.',
-    'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
+    'password_reset_subject' => 'Your New Password',
+    'greeting' => 'Hello!',
+    'intro' => 'We received a request to reset the password for your account.',
+    'new_password_line' => 'Your new password is: **:password**',
+    'action' => 'Login Now',
+    'outro' => 'Please change your password immediately after logging in for security.',
 
 ];

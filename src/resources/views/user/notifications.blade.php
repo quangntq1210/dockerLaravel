@@ -100,6 +100,7 @@
 
 @push('scripts')
     <script>
+        let FirstCount = 0;
         $(function() {
             const state = {
                 notifications: {
@@ -225,10 +226,10 @@
 
                             updateUnreadBadge(count + 1);
                         }
-                        showToast(res.message, 'success');
+                        // showToast(res.message, 'success');
                     },
                     error: function(res) {
-                        showToast(res.responseJSON.message, 'danger');
+                        // showToast(res.responseJSON.message, 'danger');
                     }
                 });
             });
@@ -453,6 +454,7 @@
 
             // Update unread badge
             function updateUnreadBadge(count) {
+                FirstCount = count;
                 if (count > 0) {
                     $('#unread-badge').text(count).show();
                 } else {

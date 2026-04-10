@@ -1,36 +1,53 @@
-<x-guest-layout>
-    <x-auth-card>
-        <x-slot name="logo">
-            <a href="/">
-                <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-            </a>
-        </x-slot>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quên mật khẩu </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7f6; height: 100vh; display: flex; align-items: center; }
+        .login-card { border: none; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .btn-primary { background-color: #0d6efd; border: none; padding: 12px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <div class="card login-card p-4">
+                    <div class="text-center mb-4">
+                        <h3 class="fw-bold text-primary">Quên mật khẩu?</h3>
+                        <p class="text-muted small">Chúng tôi sẽ gửi mật khẩu mới vào email của bạn.</p>
+                    </div>
 
-        <div class="mb-4 text-sm text-gray-600">
-            {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+                    @if (session('status'))
+                        <div class="alert alert-success p-2 small text-center mb-3">
+                            {{ session('status') }}
+                        </div>
+                    @endif
+
+                    @error('email')
+                        <div class="alert alert-danger p-2 small text-center mb-3">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                    <form method="POST" action="{{ route('password.email') }}">
+                        @csrf
+                        <div class="mb-3">
+                            <label class="form-label">Email đăng ký</label>
+                            <input type="email" name="email" class="form-control" placeholder="admin@gmail.com" required autofocus>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">GỬI MẬT KHẨU MỚI</button>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <a href="{{ route('login') }}" class="text-decoration-none small">Quay lại Đăng nhập</a>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <!-- Session Status -->
-        <x-auth-session-status class="mb-4" :status="session('status')" />
-
-        <!-- Validation Errors -->
-        <x-auth-validation-errors class="mb-4" :errors="$errors" />
-
-        <form method="POST" action="{{ route('password.email') }}">
-            @csrf
-
-            <!-- Email Address -->
-            <div>
-                <x-label for="email" :value="__('Email')" />
-
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            </div>
-
-            <div class="flex items-center justify-end mt-4">
-                <x-button>
-                    {{ __('Email Password Reset Link') }}
-                </x-button>
-            </div>
-        </form>
-    </x-auth-card>
-</x-guest-layout>
+    </div>
+</body>
+</html>
