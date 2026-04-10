@@ -156,4 +156,18 @@ class CampaignRepository implements CampaignRepositoryInterface
       ->where('status', 'scheduled')
       ->update(['status' => 'processing']) === 1;
   }
+
+
+  /**
+   * Check if campaign exists by status
+   * @param int $campaignId
+   * @param string $status
+   * @return bool
+   */
+  public function existsByStatus(int $campaignId, string $status) : bool
+  {
+    return Campaign::where('id', $campaignId)
+    ->where('status', $status)
+    ->exists();
+  }
 }

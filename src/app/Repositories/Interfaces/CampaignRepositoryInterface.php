@@ -79,4 +79,12 @@ interface CampaignRepositoryInterface
    * @return bool
    */
   public function claimScheduledCampaign(int $campaignId): bool;
+
+  /**
+   * Check if campaign exists by status
+   * @param int $campaignId
+   * @param string $status
+   * @return bool
+   */
+  public function existsByStatus(int $campaignId, string $status) : bool;
 }

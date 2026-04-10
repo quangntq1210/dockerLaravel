@@ -85,4 +85,22 @@ interface CampaignRecipientsRepositoryInterface
    * @return bool
    */
   public function existsByCampaignIdAndSubscriberId(int $campaignId, int $subscriberId): bool;
+
+  /**
+   * Get campaign recipients by campaign ID and subscriber IDs
+   * @param int $campaignId
+   * @param array $subscriberIds
+   * @return \Illuminate\Support\Collection
+   */
+  public function getByCampaignIdAndSubscriberIds(int $campaignId, array $subscriberIds);
+
+  /**
+   * Update campaign recipients status by campaign ID and subscriber IDs
+   * @param int $campaignId
+   * @param array $subscriberIds
+   * @param string $fromStatus
+   * @param string $toStatus
+   * @return int
+   */
+  public function updateStatusByCampaignIdAndSubscriberIds(int $campaignId, array $subscriberIds, string $fromStatus, string $toStatus) : int;
 }

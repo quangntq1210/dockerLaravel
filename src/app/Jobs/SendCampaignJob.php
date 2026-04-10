@@ -41,14 +41,8 @@ class SendCampaignJob implements ShouldQueue
             return;
         }
 
-        DB::transaction(function () use ($recipient, $campaign, $subscriber, $notifRepo, $recipientRepo, $campaignRepo) {
-            try {
-                Mail::to($subscriber->email)->send(new CampaignMail($campaign, $subscriber));
-
-                if (count(Mail::failures()) > 0) {
-                    throw new \RuntimeException('SMTP reported failures: ' . implode(',', Mail::failures()));
-                }
-
+        try {
+            DB::transaction(function () use ($recipient, $campaign, $subscriber, $notifRepo, $recipientRepo, $campaignRepo) {
                 if ($subscriber->user_id) {
                     $notifRepo->create([
                         'user_id'     => $subscriber->user_id,
@@ -66,18 +60,21 @@ class SendCampaignJob implements ShouldQueue
                 if (!$recipientRepo->hasPending($campaign->id)) {
                     $campaignRepo->update(['status' => 'sent'], $campaign->id);
                 }
-            } catch (\Throwable $e) {
-                Log::warning('SendCampaignJob handle failed', [
-                    'campaign_id'   => $recipient->campaign_id,
-                    'subscriber_id' => $recipient->subscriber_id,
-                    'recipient_id'  => $recipient->id,
-                    'attempt'       => $this->attempts(),
-                    'error'         => $e->getMessage(),
-                ]);
+            });
+            Mail::to($subscriber->email)->send(new CampaignMail($campaign, $subscriber));
 
-                throw $e;
+            if (count(Mail::failures()) > 0) {
+                throw new \RuntimeException('SMTP reported failures: ' . implode(',', Mail::failures()));
             }
-        });
+        } catch (\Throwable $e) {
+            Log::error('SendCampaignJob handle failed', [
+                'campaign_id'   => $recipient->campaign_id,
+                'subscriber_id' => $recipient->subscriber_id,
+                'recipient_id'  => $recipient->id,
+                'attempt'       => $this->attempts(),
+                'error'         => $e->getMessage(),
+            ]);
+        }
     }
 
     public function failed(\Throwable $exception)

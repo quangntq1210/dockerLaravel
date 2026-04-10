@@ -172,4 +172,33 @@ class CampaignRecipientsRepository implements CampaignRecipientsRepositoryInterf
       ->where('subscriber_id', $subscriberId)
       ->exists();
   }
+
+  /**
+   * Get campaign recipients by campaign ID and subscriber IDs
+   * @param int $campaignId
+   * @param array $subscriberIds
+   * @return \Illuminate\Support\Collection
+   */
+  public function getByCampaignIdAndSubscriberIds(int $campaignId, array $subscriberIds)
+  {
+    return CampaignRecipient::where('campaign_id', $campaignId)
+      ->whereIn('subscriber_id', $subscriberIds)
+      ->get();
+  }
+
+  /**
+   * Update campaign recipients status by campaign ID and subscriber IDs
+   * @param int $campaignId
+   * @param array $subscriberIds
+   * @param string $fromStatus
+   * @param string $toStatus
+   * @return int
+   */
+  public function updateStatusByCampaignIdAndSubscriberIds(int $campaignId, array $subscriberIds, string $fromStatus, string $toStatus) : int
+  {
+    return CampaignRecipient::where('campaign_id', $campaignId)
+      ->whereIn('subscriber_id', $subscriberIds)
+      ->where('status', $fromStatus)
+      ->update(['status' => $toStatus]);
+  }
 }

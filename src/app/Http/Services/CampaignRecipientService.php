@@ -5,8 +5,6 @@ namespace App\Http\Services;
 use App\Repositories\Interfaces\CampaignRecipientsRepositoryInterface;
 use App\Repositories\Interfaces\SubscriberRepositoryInterface;
 
-use function PHPUnit\Framework\isEmpty;
-
 class CampaignRecipientService
 {
     protected $campaignRecipientsRepo;

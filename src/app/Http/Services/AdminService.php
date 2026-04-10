@@ -24,7 +24,7 @@ class AdminService
 
         $cacheKey = 'dashboard_' . md5(json_encode($filters) . request()->page);
 
-        return Cache::remember($cacheKey, 60, function () use ($filters) {
+        return Cache::tags(['dashboard'])->remember($cacheKey, 300, function () use ($filters) {
             return [
                 'stats' => $this->dashboardRepo->getStats(),
                 'data' => $this->dashboardRepo->getCampaignReport($filters)

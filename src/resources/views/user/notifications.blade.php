@@ -62,7 +62,6 @@
             {{-- Table Campaign --}}
             <h4 class="fw-bold mb-0">
                 {{ __('message.campaigns') }}
-                <span id="unread-badge" class="badge bg-danger ms-1" style="display:none;"></span>
             </h4>
 
             <div id="campaign-table">
@@ -291,7 +290,8 @@
                         $('#select-all-campaigns').prop('checked', false);
                     },
                     error: function(res) {
-                        showToast(res.responseJSON.errors.campaigns[0], 'danger');
+                        showToast(res?.responseJSON?.errors?.campaigns[0] ||
+                            @js(__('message.error_occurred')), 'danger');
                     }
                 });
             });
@@ -453,8 +453,6 @@
 
             // Update unread badge
             function updateUnreadBadge(count) {
-                console.log('count', count);
-
                 if (count > 0) {
                     $('#unread-badge').text(count).show();
                 } else {

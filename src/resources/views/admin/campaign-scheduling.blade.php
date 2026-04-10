@@ -8,18 +8,6 @@
         </div>
     </div>
 
-    {{-- Display errors --}}
-    @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
     {{-- Display success message --}}
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show">
@@ -54,7 +42,6 @@
                                         <option value="{{ $campaign->id }}"
                                             {{ old('campaign_id') == $campaign->id ? 'selected' : '' }}>
                                             {{ $campaign->title }}
-                                            <span class="badge">{{ $campaign->status }}</span>
                                         </option>
                                     @endforeach
                                 @endif
@@ -148,10 +135,9 @@
             </div>
         </div>
     </div>
+@endsection
 
-    {{-- Bootstrap JS + jQuery + AJAX Search --}}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@push('scripts')
     <script>
         const selectedIds = new Set();
 
@@ -188,19 +174,16 @@
                     const disabledClass = isSelected ? 'text-muted' : 'text-primary';
 
                     html += `
-          <div class="subscriber-item d-flex justify-content-between align-items-center py-1 px-2 border-bottom"
-              style="cursor:pointer"
-              data-id="${sub.id}" 
-              data-name="${sub.name}" 
-              data-email="${sub.email}">
+        <div class="subscriber-item d-flex justify-content-between align-items-center py-1 px-2 border-bottom"
+            style="cursor:pointer" data-id="${sub.id}" data-name="${sub.name}" data-email="${sub.email}">
             <span>
-              ${sub.name} 
-              <small class="text-muted">(${sub.email})</small>
+                ${sub.name}
+                <small class="text-muted">(${sub.email})</small>
             </span>
             <span class="${disabledClass} small">
-              ${isSelected ? '✓ {{ __('message.selected') }}' : '+ {{ __('message.add') }}'}
+                ${isSelected ? '✓ {{ __('message.selected') }}' : '+ {{ __('message.add') }}'}
             </span>
-          </div>
+        </div>
         `;
                 });
 
@@ -221,10 +204,10 @@
             // Add tag to display
             $('#selected-subscribers').append(
                 `<span class="badge bg-primary d-flex align-items-center gap-1" id="tag-${id}">
-                ${name}
-                <button type="button" class="btn-close btn-close-white btn-sm"
-                    onclick="removeSubscriber(${id})" style="font-size:0.6rem"></button>
-             </span>`
+            ${name}
+            <button type="button" class="btn-close btn-close-white btn-sm" onclick="removeSubscriber(${id})"
+                style="font-size:0.6rem"></button>
+        </span>`
             );
 
             // Add hidden input
@@ -254,4 +237,4 @@
             }
         });
     </script>
-@endsection
+@endpush

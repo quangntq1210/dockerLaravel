@@ -116,4 +116,5 @@ return [
   'send_account_mail' => 'Send account mail',
   'account_mail_content' => 'Your account: :email, Your password: :password',
   'login_url' => 'Login URL',
+  'campaign_not_draft' => 'Campaign not found or not in draft status',
 ];

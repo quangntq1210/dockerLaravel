@@ -133,6 +133,8 @@ return [
         'campaigns.*' => 'Chiến dịch',
         'name' => 'Tên',
         'email' => 'Email',
+        'recipients' => 'Người nhận',
+        'send_time' => 'Thời gian gửi',
     ],
 
 ];

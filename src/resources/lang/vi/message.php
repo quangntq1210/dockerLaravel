@@ -116,4 +116,5 @@ return [
   'send_account_mail' => 'Gửi email tài khoản',
   'account_mail_content' => 'Tài khoản của bạn: :email, Mật khẩu của bạn: :password',
   'login_url' => 'URL đăng nhập',
+  'campaign_not_draft' => 'Chiến dịch không tồn tại hoặc không ở trạng thái nháp',
 ];

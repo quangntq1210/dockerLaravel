@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ __('message.notification_management') }}</title>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/user.css') }}">
 </head>
 
 <body class="bg-light">
@@ -47,7 +47,6 @@
             days_ago: @js(__('message.days_ago')),
         };
     </script>
-    <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{ asset('js/helpers/renderPagination.js') }}"></script>
     <script>

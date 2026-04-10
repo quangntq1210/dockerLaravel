@@ -151,6 +151,8 @@ return [
         'campaigns.*' => 'Campaign',
         'name' => 'Name',
         'email' => 'Email',
+        'recipients' => 'Recipients',
+        'send_time' => 'Send Time',
     ],
 
 ];
