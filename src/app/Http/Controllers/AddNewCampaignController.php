@@ -8,41 +8,40 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\CreateCampaignRequest;
 use Exception;
 
+namespace App\Http\Controllers;
+
+
+use App\Http\Services\AddNewCampaignService;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\CreateCampaignRequest;
+use Exception;
+
 class AddNewCampaignController extends Controller
 {
-    protected $campaignService;
+    protected $service;
 
-    public function __construct(AddNewCampaignService $campaignService)
+    public function __construct(AddNewCampaignService $service)
     {
-        $this->campaignService = $campaignService;
+        $this->service = $service;
     }
 
     public function store(CreateCampaignRequest $request)
     {
         try {
-        
-           $validated = $request->validated();
+            // Request đã tự động validate trước khi vào đây
+            $campaign = $this->service->createCampaign($request->validated());
 
-            $result = $this->campaignService->createCampaign($validated);
+            return response()->json([
+                'success' => true,
+                'message' => __('message.save_success'),
+                'data'    => $campaign
+            ], 201);
 
-            if ($result) {
-                return response()->json([
-                    'success' => true,
-                    'message' => __('message.save_success'), 
-                    'data'    => $result
-                ]);
-            }
         } catch (Exception $e) {
-           
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage() 
+                'message' => 'System error: ' . $e->getMessage()
             ], 500);
         }
-
-        return response()->json([
-            'success' => false,
-            'message' => __('message.save_error')
-        ], 500);
     }
 }

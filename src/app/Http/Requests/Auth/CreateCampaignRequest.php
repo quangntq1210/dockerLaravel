@@ -10,21 +10,18 @@ class CreateCampaignRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
-    {
-        return true;
-    }
+   public function authorize(): bool { return true; }
 
     /**
      * Get the validation rules that apply to the request.
      *
      * @return array
      */
-    public function rules(): array
+  public function rules(): array
     {
         return [
-            'title'   => 'required|max:255',
-            'content' => 'required', 
+            'title'   => 'required|string|max:255',
+            'content' => 'required|string', 
         ];
     }
 

@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Model;
 
-class Campaign extends Authenticatable
+class Campaign extends Model
 {
     use HasFactory, Notifiable;
 
@@ -19,7 +19,6 @@ class Campaign extends Authenticatable
     
     /**
      * Get the recipients for the campaign.
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyCampaignRecipient
      */
     public function recipients()
     {
@@ -28,7 +27,6 @@ class Campaign extends Authenticatable
 
     /**
      * Get the subscribers for the campaign.
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToManyCampaignRecipient
      */
     public function subscribers()
     {

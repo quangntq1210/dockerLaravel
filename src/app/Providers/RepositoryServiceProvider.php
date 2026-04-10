@@ -47,6 +47,14 @@ class RepositoryServiceProvider extends ServiceProvider
             DashboardRepositoryInterface::class,
             DashboardRepository::class
         );
+        $this->app->bind(
+        \App\Repositories\Interfaces\DashboardRepositoryInterface::class,
+        \App\Repositories\Eloquent\DashboardRepository::class
+    );
+    $this->app->bind(
+        \App\Repositories\Interfaces\AdminServiceInterface::class,
+        \App\Http\Services\AdminService::class
+    );
     }
 
     /**

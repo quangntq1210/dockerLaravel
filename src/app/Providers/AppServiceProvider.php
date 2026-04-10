@@ -12,6 +12,7 @@ use App\Repositories\Interfaces\DashboardRepositoryInterface;
 use App\Repositories\DashboardRepository;
 use Illuminate\Support\Facades\App;
 
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -21,7 +22,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+       $this->app->bind(
+        \App\Repositories\Interfaces\AdminServiceInterface::class,
+        \App\Http\Services\AdminService::class
+    );
+    $this->app->bind(
+    \App\Repositories\Interfaces\CampaignRepositoryInterface::class, 
+    \App\Repositories\Eloquent\CampaignRepository::class
+);
     }
 
     /**

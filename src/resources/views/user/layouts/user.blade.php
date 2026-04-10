@@ -49,7 +49,7 @@
                     url: @js(route('locale.update')),
                     type: 'PUT',
                     contentType: 'application/json',
-                    data: JSON.stringify({ locale: locale }),
+                    data: JSON.stringify({ locale: locale }),s
                     success: function () {
                         location.reload();
                     }

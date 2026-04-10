@@ -75,75 +75,112 @@
 
 @push('scripts')
 <script>
-    window.LaravelData = {
+  
+    window.CampaignConfig = {
         storeRoute: "{{ route('admin.campaigns.store') }}",
         csrfToken: "{{ csrf_token() }}",
-        msgSaving: "{{ __('message.saving') }}",
-        msgSuccess: "{{ __('message.save_success') }}",
-        msgComplete: "{{ __('message.save_complete') }}",
-        msgError: "{{ __('message.save_error') }}"
+        messages: {
+            saving: "{{ __('message.saving') }}",
+            success: "{{ __('message.save_success') }}",
+            complete: "{{ __('message.save_complete') }}",
+            error: "{{ __('message.save_error') }}"
+        }
     };
 
-    $(document).ready(function() {
-  $(document).on('submit', '#modalCreateCampaignForm', function (e) {
-    e.preventDefault();     
-    
-    const $btn = $('#btn-save-new-campaign'); 
-    const config = window.LaravelData;
-    const title = $('#campaign-title').val();
-    const content = $('#campaign-content').val();
+    const CampaignManager = {
+      
+        handleCreateSubmit: function(e) {
+            e.preventDefault();
+            
+            const $form = $(e.target);
+            const $btn = $form.find('#btn-save-new-campaign');
+            const config = window.CampaignConfig;
 
-    $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> ' + config.msgSaving);
+       
+            const payload = {
+                _token: config.csrfToken,
+                title: $form.find('#campaign-title').val(),
+                content: $form.find('#campaign-content').val()
+            };
 
-    $.ajax({
-        url: config.storeRoute,
-        type: "POST",
-        data: {
-            _token: config.csrfToken,
-            title: title,
-            content: content
-        },
-        success: function (response) {
-            if (response.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Thành công!',
-                    text: response.message || config.msgSuccess,
-                    showConfirmButton: false,
-                    timer: 2000,
-                    timerProgressBar: true
-                });
+        
+            this.setLoading($btn, true);
 
-                const $select = $('#campaign_id');
-                if ($select.length > 0) {
-                    const newOption = new Option(response.data.title, response.data.id, true, true);
-                    $select.append(newOption).trigger('change');
+            $.ajax({
+                url: config.storeRoute,
+                type: "POST",
+                data: payload,
+                success: (response) => {
+                    if (response.success) {
+                        this.onSaveSuccess(response);
+                        $form[0].reset();
+                        $('#exampleModal').modal('hide');
+                    }
+                },
+                error: (xhr) => {
+                    this.onSaveError(xhr);
+                },
+                complete: () => {
+                    this.setLoading($btn, false);
                 }
-                $('#exampleModal').modal('hide');
-                $('#modalCreateCampaignForm')[0].reset();
+            });
+        },
+
+      
+        onSaveSuccess: function(response) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: response.message || window.CampaignConfig.messages.success,
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true
+            });
+
+           
+            const $select = $('#campaign_id');
+            if ($select.length > 0) {
+                const newOption = new Option(response.data.title, response.data.id, true, true);
+                $select.append(newOption).trigger('change');
             }
         },
-        error: function (xhr) {
+
+        onSaveError: function(xhr) {
             console.error(xhr.responseText);
-            let errorMsg = config.msgError;
+            let errorMsg = window.CampaignConfig.messages.error;
+
             if (xhr.status === 422) {
+                // Lỗi Validation từ Request class
                 const errors = xhr.responseJSON.errors;
                 errorMsg = Object.values(errors).flat().join('<br>');
             } else if (xhr.responseJSON && xhr.responseJSON.message) {
                 errorMsg = xhr.responseJSON.message;
             }
+
             Swal.fire({
                 icon: 'error',
                 title: 'Ối, có lỗi rồi!',
-                html: errorMsg, 
+                html: errorMsg,
                 confirmButtonColor: '#0d6efd'
             });
         },
-        complete: function () {
-            $btn.prop('disabled', false).html('<i class="bi bi-save me-2"></i> ' + config.msgComplete);
+
+       
+        setLoading: function($btn, isLoading) {
+            if (isLoading) {
+                $btn.prop('disabled', true)
+                    .html(`<span class="spinner-border spinner-border-sm"></span> ${window.CampaignConfig.messages.saving}`);
+            } else {
+                $btn.prop('disabled', false)
+                    .html(`<i class="bi bi-save me-2"></i> ${window.CampaignConfig.messages.complete}`);
+            }
         }
+    };
+
+    $(document).ready(function() {
+        $(document).on('submit', '#modalCreateCampaignForm', function(e) {
+            CampaignManager.handleCreateSubmit(e);
+        });
     });
-});
-    }); 
 </script>
 @endpush

@@ -8,6 +8,8 @@ use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\AddNewCampaignController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -24,7 +26,7 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Cập nhật ngôn ngữ
+
 Route::put('/locale', [LocaleController::class, 'update'])->name('locale.update');
 
 /*
@@ -39,29 +41,28 @@ Route::controller(LoginController::class)->group(function () {
     Route::post('/logout', 'logout')->name('logout');
 });
 
-/*
-|--------------------------------------------------------------------------
-| Admin Routes (Prefix 'admin' đã bao gồm cho tất cả route bên trong)
-|--------------------------------------------------------------------------
-*/
+
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     
-    // Dashboard chính
+ 
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    
-    // Quản lý lịch trình chiến dịch (Campaign Scheduling)
+   
     Route::get('/campaign-scheduling', [CampaignSchedulingController::class, 'index'])->name('admin.campaign-scheduling');
     Route::post('/campaign-scheduling', [CampaignSchedulingController::class, 'store'])->name('admin.campaign-scheduling.store');
-    
-    // Tìm kiếm Subscriber (AJAX)
-    Route::get('/subscribers/search', [SubscriberController::class, 'search'])->name('admin.subscribers.search');
-    
-    // Tạo chiến dịch mới từ Modal (AJAX)
-    // URL thực tế: http://localhost:8088/admin/campaigns/store
-    Route::post('/campaigns/store', [AddNewCampaignController::class, 'store'])->name('admin.campaigns.store');
-});
 
+    Route::get('/subscribers/search', [SubscriberController::class, 'search'])->name('admin.subscribers.search');
+ 
+    Route::post('/campaigns/store', [AddNewCampaignController::class, 'store'])->name('admin.campaigns.store');
+
+
+});
+Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
+                ->name('password.request');
+
+
+Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
+                ->name('password.email');
 /*
 |--------------------------------------------------------------------------
 | User Routes
