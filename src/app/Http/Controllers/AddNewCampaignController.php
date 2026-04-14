@@ -28,7 +28,7 @@ class AddNewCampaignController extends Controller
     public function store(CreateCampaignRequest $request)
     {
         try {
-            // Request đã tự động validate trước khi vào đây
+           
             $campaign = $this->service->createCampaign($request->validated());
 
             return response()->json([

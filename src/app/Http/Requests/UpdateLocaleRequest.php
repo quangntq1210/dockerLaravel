@@ -12,7 +12,7 @@ class UpdateLocaleRequest extends FormRequest
     {
         return [
             'locale' => 'required|in:vi,en',
-            // 'withAdminPayload' => 'sometimes'
+           
         ];
     }
 }

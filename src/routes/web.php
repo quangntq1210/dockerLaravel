@@ -11,9 +11,11 @@ use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\CampaignRecipientController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AddNewCampaignController;
+use App\Http\Controllers\ManagerUserController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\AuthController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -41,20 +43,40 @@ Route::controller(LoginController::class)->group(function () {
 
 
 
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+// Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+ 
+//     Route::get('/users', [ManagerUserController::class, 'index'])->name('users.index');
     
- 
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+//     Route::get('/api/users', [ManagerUserController::class, 'getData'])->name('users.data');
+//     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
    
-    Route::get('/campaign-scheduling', [CampaignSchedulingController::class, 'index'])->name('admin.campaign-scheduling');
-    Route::post('/campaign-scheduling', [CampaignSchedulingController::class, 'store'])->name('admin.campaign-scheduling.store');
+//     Route::get('/campaign-scheduling', [CampaignSchedulingController::class, 'index'])->name('admin.campaign-scheduling');
+//     Route::post('/campaign-scheduling', [CampaignSchedulingController::class, 'store'])->name('admin.campaign-scheduling.store');
 
-    Route::get('/subscribers/search', [SubscriberController::class, 'search'])->name('admin.subscribers.search');
+//     Route::get('/subscribers/search', [SubscriberController::class, 'search'])->name('admin.subscribers.search');
  
-    Route::post('/campaigns/store', [AddNewCampaignController::class, 'store'])->name('admin.campaigns.store');
-//   Route::get('/password/edit', [PasswordController::class, 'edit'])->name('password.edit');
-//     Route::put('/password', [PasswordController::class, 'update'])->name('password.update');
+//     Route::post('/campaigns/store', [AddNewCampaignController::class, 'store'])->name('admin.campaigns.store');
+// //   Route::get('/password/edit', [PasswordController::class, 'edit'])->name('password.edit');
+// //     Route::put('/password', [PasswordController::class, 'update'])->name('password.update');
 
+// });
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    
+   
+    Route::get('/users', [ManagerUserController::class, 'index'])->name('users.index');
+    
+  
+    Route::get('/api/users', [ManagerUserController::class, 'getData'])->name('users.data');
+
+    
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+   
+   
+    Route::get('/campaign-scheduling', [CampaignSchedulingController::class, 'index'])->name('campaign-scheduling');
+    Route::post('/campaign-scheduling', [CampaignSchedulingController::class, 'store'])->name('campaign-scheduling.store');
+
+    Route::get('/subscribers/search', [SubscriberController::class, 'search'])->name('subscribers.search');
+    Route::post('/campaigns/store', [AddNewCampaignController::class, 'store'])->name('campaigns.store');
 });
 Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
                 ->name('password.request');

@@ -21,22 +21,10 @@ class LocaleService
     {
       
         App::setLocale($locale);
-
-        return [
-            'sidebar' => [
-                'title'     => __('sidebar.title'),
-                'dashboard' => __('sidebar.dashboard'),
-                'schedule'  => __('sidebar.schedule'),
-                'logout'    => __('sidebar.logout'),
-            ],
-            'dashboard' => [
-                'title'           => __('dashboard.title'),
-                'total_campaign' => __('dashboard.total_campaign'), 
-                'subscriber'      => __('dashboard.subscriber'),
-                'report'          => __('dashboard.report'),
-                'filter'          => __('dashboard.filter'),
-                'search_placeholder' => __('dashboard.search_placeholder'),
-            ]
+    return [
+            'sidebar'   => __ ('sidebar'),   
+            'dashboard' => __ ('dashboard'), 
+            'message'   => __ ('message'),  
         ];
     }
 

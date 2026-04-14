@@ -10,7 +10,7 @@ class UpdatePasswordRequest extends FormRequest
     {
         return [
             'email' => 'required|email|exists:users,email',
-            'current_password' => 'required', // PHẢI THÊM DÒNG NÀY
+            'current_password' => 'required',
             'password' => 'required|min:8|confirmed',
         ];
     }
