@@ -83,7 +83,10 @@
             saving: "{{ __('message.saving') }}",
             success: "{{ __('message.save_success') }}",
             complete: "{{ __('message.save_complete') }}",
-            error: "{{ __('message.save_error') }}"
+            error: "{{ __('message.save_error') }}",
+
+                successTitle: "{{ __('message.success_title') }}",
+    errorTitle: "{{ __('message.error_title') }}"
         }
     };
 
@@ -130,7 +133,7 @@
         onSaveSuccess: function(response) {
             Swal.fire({
                 icon: 'success',
-                title: 'Thành công!',
+                title: window.CampaignConfig.messages.successTitle,
                 text: response.message || window.CampaignConfig.messages.success,
                 showConfirmButton: false,
                 timer: 2000,
@@ -150,7 +153,7 @@
             let errorMsg = window.CampaignConfig.messages.error;
 
             if (xhr.status === 422) {
-                // Lỗi Validation từ Request class
+               
                 const errors = xhr.responseJSON.errors;
                 errorMsg = Object.values(errors).flat().join('<br>');
             } else if (xhr.responseJSON && xhr.responseJSON.message) {
@@ -159,7 +162,7 @@
 
             Swal.fire({
                 icon: 'error',
-                title: 'Ối, có lỗi rồi!',
+             title: window.CampaignConfig.messages.errorTitle,
                 html: errorMsg,
                 confirmButtonColor: '#0d6efd'
             });

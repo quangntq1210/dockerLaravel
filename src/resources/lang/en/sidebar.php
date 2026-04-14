@@ -5,4 +5,5 @@ return [
     'schedule' => 'Schedule',
     'subscriber' => 'Subscribers',
     'logout' => 'Logout',
+    'user_manager' => 'User Manager'
 ];

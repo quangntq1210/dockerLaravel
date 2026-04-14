@@ -99,4 +99,22 @@ return [
   "save_success" => "Chiến dịch đã được lưu thành công",
   "save_error" => "Lỗi khi lưu chiến dịch, vui lòng thử lại",
   "save_complete" => "Hoàn tất",
+  'success_title' => 'Thành công!',
+    'error_title' => 'Có lỗi rồi!',
+    'user_list' => 'Danh sách người dùng hệ thống',
+    'id' => 'ID',
+    'username' => 'Tên người dùng',
+    'email' => 'Email',
+    'password_hash' => 'Mật khẩu (Hash)',
+    'role' => 'Vai trò',
+    'status' => 'Trạng thái',
+
+    'loading' => 'Đang tải dữ liệu...',
+    'no_data' => 'Không có dữ liệu người dùng.',
+    'server_error' => 'Lỗi: Không thể kết nối với máy chủ.',
+
+    'verified' => 'Đã xác thực',
+    'not_verified' => 'Chưa xác thực',
+
+    'view_hash' => 'Xem mã Hash',
 ];

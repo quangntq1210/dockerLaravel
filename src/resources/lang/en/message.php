@@ -98,5 +98,22 @@ return [
   "saving" => "Saving...",
   "save_success" => "Campaign saved successfully",
   "save_error" => "Error saving campaign, please try again",
-  "save_complete" => "Save complete"
+  "save_complete" => "Save complete",
+      'success_title' => 'Success!',
+    'error_title' => 'Something went wrong!',
+
+       'user_list' => 'User List',
+    'id' => 'ID',
+    'username' => 'Username',
+    'email' => 'Email',
+    'password_hash' => 'Password (Hash)',
+    'role' => 'Role',
+    'status' => 'Status',
+    'loading' => 'Loading data...',
+    'no_data' => 'No user data available.',
+    'server_error' => 'Error: Cannot connect to server.',
+    'verified' => 'Verified',
+    'not_verified' => 'Not verified',
+    'view_hash' => 'View hash',
+    
 ];
