@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRM - Admin</title>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -69,168 +70,101 @@
     </div>
 
     <script src="{{ asset('js/app.js') }}"></script>
+
     <script>
         const CRM_Admin = {
-
-                currentLangData: null,
-
-
-                applyLanguage: function(langData) {
-                    if (!langData) return;
-                    this.currentLangData = langData;
-
-                    $('[data-lang]').each(function() {
-                        const $el = $(this);
-                        const key = $el.data('lang');
-
-                        const value = key.split('.').reduce((obj, i) => (obj ? obj[i] : null), langData);
-
-                        if (value) {
-                            if ($el.is('input, textarea')) {
-                                $el.attr('placeholder', value);
-                            } else {
-                                $el.text(value);
-                            }
+            currentLangData: null,
+            applyLanguage: function(langData) {
+                if (!langData) return;
+                this.currentLangData = langData;
+                $('[data-lang]').each(function() {
+                    const $el = $(this);
+                    const key = $el.data('lang');
+                    const value = key.split('.').reduce((obj, i) => (obj ? obj[i] : null), langData);
+                    if (value) {
+                        if ($el.is('input, textarea')) {
+                            $el.attr('placeholder', value);
+                        } else {
+                            $el.text(value);
                         }
-                    });
-                },
-                <<
-                << << < HEAD
-
-
-                fetchDashboardData: function(url) {
-                    $.ajax({
-                        url: url,
-                        method: "GET",
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        success: function(response) {
-
-                            if (response.table) {
-                                $('#campaignTable').html(response.table);
-                            }
-
-                            if (response.stats) {
-                                $('#total-campaigns').text(response.stats.total_campaigns);
-                                $('#total-subscribers').text(response.stats.total_subscribers);
-                            }
-                            if (CRM_Admin.currentLangData) {
-                                CRM_Admin.applyLanguage(CRM_Admin.currentLangData);
-                            }
-                        },
-                        error: function() {
-                            window.location.href = url;
-                        }
-                    }); ===
-                    === =
-                    fetchDashboardData: function(url) {
-                        $.ajax({
-                            url: url,
-                            method: "GET",
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest'
-                            },
-                            success: function(response) {
-
-                                if (response.table) {
-                                    $('#campaignTable').html(response.table);
-                                }
-                                if (response.stats) {
-                                    $('#total-campaigns').text(response.stats.total_campaigns);
-                                    $('#total-subscribers').text(response.stats.total_subscribers); >>>
-                                    >>> > dc6ce6632bf42cab7f2b52ceb4f62282bd1b775c
-                                }
-
-                                if (CRM_Admin.currentLangData) {
-                                    CRM_Admin.applyLanguage(CRM_Admin.currentLangData);
-                                }
-                                if (typeof fetchUsers === 'function') {
-                                    fetchUsers(currentPage);
-                                }
-                            },
-                            error: function() {
-                                window.location.href = url;
-                            }
-                        });
                     }
-                };
+                });
+            },
+            fetchDashboardData: function(url) {
+                $.ajax({
+                    url: url,
+                    method: "GET",
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    success: function(response) {
 
-                <<
-                << << < HEAD
-                $(document).ready(function() {
-                        $('#languageSwitcher').on('change', function() {
-                                    const locale = $(this).val();
-                                    $.ajax({
-                                                url: "{{ route('locale.update') }}",
-                                                method: "PUT",
-                                                data: {
-                                                    locale: locale,
-                                                    _token: "{{ csrf_token() }}"
-                                                },
-                                                success: function(response) {
-                                                        CRM_Admin.applyLanguage(response.lang);
-                                                        let activePageUrl = $('.pagination .active a').attr('href');
-                                                        CRM_Admin.fetchDashboardData(activePageUrl ||
-                                                            "{{ route('admin.dashboard') }}");
-                                                    } ===
-                                                    === =
-                                                    $(document).ready(function() {
-                                                        $('#languageSwitcher').on('change', function() {
-                                                            const locale = $(this).val();
+                        if (response.table) {
+                            $('#campaignTable').html(response.table);
+                        }
+                        if (response.stats) {
+                            $('#total-campaigns').text(response.stats.total_campaigns);
+                            $('#total-subscribers').text(response.stats.total_subscribers);
+                        }
 
-                                                            $.ajax({
-                                                                url: "{{ route('locale.update') }}",
-                                                                method: "PUT",
-                                                                data: {
-                                                                    locale: locale,
-                                                                    _token: "{{ csrf_token() }}"
-                                                                },
-                                                                success: function(response) {
+                        if (CRM_Admin.currentLangData) {
+                            CRM_Admin.applyLanguage(CRM_Admin.currentLangData);
+                        }
+                        if (typeof fetchUsers === 'function') {
+                            fetchUsers(currentPage);
+                        }
+                    },
+                    error: function() {
+                        window.location.href = url;
+                    }
+                });
+            }
+        };
 
-                                                                    CRM_Admin.currentLangData =
-                                                                        response.lang;
+        $(document).ready(function() {
+            $('#languageSwitcher').on('change', function() {
+                const locale = $(this).val();
+
+                $.ajax({
+                    url: "{{ route('locale.update') }}",
+                    method: "PUT",
+                    data: {
+                        locale: locale,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+
+                        CRM_Admin.currentLangData = response.lang;
 
 
-                                                                    CRM_Admin.applyLanguage(response
-                                                                        .lang);
+                        CRM_Admin.applyLanguage(response.lang);
 
-                                                                    if (typeof fetchUsers ===
-                                                                        'function') {
+                        if (typeof fetchUsers === 'function') {
 
-                                                                        fetchUsers(currentPage);
-                                                                    } else {
+                            fetchUsers(currentPage);
+                        } else {
 
-                                                                        let activePageUrl = $(
-                                                                            '.pagination .active a'
-                                                                            ).attr('href');
-                                                                        CRM_Admin
-                                                                            .fetchDashboardData(
-                                                                                activePageUrl ||
-                                                                                "{{ route('admin.dashboard') }}"
-                                                                                );
-                                                                    }
+                            let activePageUrl = $('.pagination .active a').attr('href');
+                            CRM_Admin.fetchDashboardData(activePageUrl ||
+                                "{{ route('admin.dashboard') }}");
+                        }
 
-                                                                    Swal.fire({
-                                                                        icon: 'success',
-                                                                        title: locale ===
-                                                                            'vi' ?
-                                                                            'Đã đổi ngôn ngữ!' :
-                                                                            'Language changed!',
-                                                                        toast: true,
-                                                                        position: 'top-end',
-                                                                        showConfirmButton: false,
-                                                                        timer: 2000 >>>
-                                                                            >>> >
-                                                                            dc6ce6632bf42cab7f2b52ceb4f62282bd1b775c
-                                                                    });
-                                                                },
-                                                                error: function() {
-                                                                    window.location.reload();
-                                                                }
-                                                            });
-                                                        });
-                                                    });
+                        Swal.fire({
+                            icon: 'success',
+                            title: locale === 'vi' ? 'Đã đổi ngôn ngữ!' :
+                                'Language changed!',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    },
+                    error: function() {
+                        window.location.reload();
+                    }
+                });
+            });
+        });
     </script>
     @stack('scripts')
 </body>
