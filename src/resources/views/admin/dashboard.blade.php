@@ -1,31 +1,28 @@
 @extends('admin.layouts.admin')
-<<<<<<< HEAD
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 @endpush
-=======
->>>>>>> d6edc5e93a1341eca53919208a0412602627170e
 
 @section('content')
 <div class="row">
     <div class="col-md-12 mb-4">
-<<<<<<< HEAD
        <h2 data-lang="dashboard.title"></h2>
-      
     </div>
     
-    <div class="col-md-3">
-        <div class="card p-3 bg-white border-start border-primary border-4">
-           <p data-lang="dashboard.total_campaign"></p>
-            <h3 class="fw-bold">{{ $stats['total_campaigns'] ?? 0 }}</h3>
-        </div>
+   <div class="col-md-3">
+    <div class="card p-3 bg-white border-start border-primary border-4">
+        <p data-lang="dashboard.total_campaign"></p>
+        <h3 class="fw-bold" id="total-campaigns">{{ $stats['total_campaigns'] ?? 0 }}</h3>
     </div>
-    <div class="col-md-3">
-        <div class="card p-3 bg-white border-start border-success border-4">
-      <p data-lang="dashboard.subscriber"></p>
-            <h3 class="fw-bold">{{ $stats['total_subscribers'] ?? 0 }}</h3>
-        </div>
+</div>
+
+<div class="col-md-3">
+    <div class="card p-3 bg-white border-start border-success border-4">
+        <p data-lang="dashboard.subscriber"></p>
+        <h3 class="fw-bold" id="total-subscribers">{{ $stats['total_subscribers'] ?? 0 }}</h3>
     </div>
+</div>
+
 </div>
 
 <div class="row mt-5">
@@ -78,58 +75,48 @@
 @push('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-function applyLanguage(lang) {
-    $('[data-lang]').each(function () {
-        let key = $(this).data('lang'); // vd: sidebar.title
+$(document).ready(function () {
 
-        let keys = key.split('.');
-        let value = lang;
+    function handleDashboardResponse(response) {
+        $('#campaignTable').html(response.table);
 
-        keys.forEach(k => {
-            value = value[k];
-        });
-
-        if (value) {
-            $(this).text(value);
+        if (response.stats) {
+            $('#total-campaigns').text(response.stats.total_campaigns);
+            $('#total-subscribers').text(response.stats.total_subscribers);
         }
-    });
-}
-
-function loadInitialLang() {
-    let locale = $('#languageSwitcher').val();
-
-    $.ajax({
-        url: "{{ route('locale.update') }}",
-        method: "PUT",
-        data: {
-            locale: locale,
-            _token: "{{ csrf_token() }}"
-        },
-        success: function (response) {
+        if (response.lang) {
             applyLanguage(response.lang);
         }
-    });
-}
-
-$(document).ready(function () {
+    }
 
     loadInitialLang();
 
-    $('#filterForm').on('submit', function(e) {
+    $('#filterForm').on('submit', function (e) {
         e.preventDefault();
         $.ajax({
             url: $(this).attr('action'),
             data: $(this).serialize(),
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            success: function(response) {
-                $('#campaignTable').html(response.table);
+            success: function (response) {
+                handleDashboardResponse(response);
+            }
+        });
+    });
+
+    $(document).on('click', '#campaignTable .pagination a', function (e) {
+        e.preventDefault();
+        let url = $(this).attr('href');
+        $.ajax({
+            url: url,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            success: function (response) {
+                handleDashboardResponse(response);
             }
         });
     });
 
     $('#languageSwitcher').on('change', function () {
         let locale = $(this).val();
-
         $.ajax({
             url: "{{ route('locale.update') }}",
             method: "PUT",
@@ -138,48 +125,39 @@ $(document).ready(function () {
                 _token: "{{ csrf_token() }}"
             },
             success: function (response) {
-                $('#campaignTable').html(response.table);
-                applyLanguage(response.lang);
+                handleDashboardResponse(response);
             }
         });
     });
 
 });
 
+function applyLanguage(lang) {
+    $('[data-lang]').each(function () {
+        let key = $(this).data('lang');
+        let keys = key.split('.');
+        let value = lang;
+        keys.forEach(k => { if (value) value = value[k]; });
+        if (value) $(this).text(value);
+    });
+}
+
+function loadInitialLang() {
+    let locale = $('#languageSwitcher').val();
+    $.ajax({
+        url: "{{ route('locale.update') }}",
+        type: "POST",
+        data: {
+            locale: locale,
+            _token: "{{ csrf_token() }}",
+            _method: "PUT"
+        },
+        success: function (response) {
+            applyLanguage(response.lang);
+        }
+    });
+}
 </script>
 @endpush
 
-=======
-        <h2 class="fw-bold">Bảng điều khiển hệ thống</h2>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card p-3 bg-white border-start border-primary border-4">
-            <p class="text-muted mb-1">Tổng Chiến Dịch</p>
-            <h3 class="fw-bold">{{ $stats['total_campaigns'] ?? 0 }}</h3>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card p-3 bg-white border-start border-success border-4">
-            <p class="text-muted mb-1">Người Đăng Ký</p>
-            <h3 class="fw-bold">{{ $stats['total_subscribers'] ?? 0 }}</h3>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card p-3 bg-white border-start border-warning border-4">
-            <p class="text-muted mb-1">Chiến Dịch Chờ Gửi</p>
-            <h3 class="fw-bold">{{ $stats['pending_jobs'] ?? 0 }}</h3>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card p-3 bg-white border-start border-danger border-4">
-            <p class="text-muted mb-1">Thông Báo Đã Gửi</p>
-            <h3 class="fw-bold">{{ $stats['sent_notifications'] ?? 0 }}</h3>
-        </div>
-    </div>
-</div>
-@endsection
->>>>>>> d6edc5e93a1341eca53919208a0412602627170e
+     
