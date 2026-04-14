@@ -9,7 +9,8 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\AddNewCampaignController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
-
+use App\Http\Controllers\Auth\PasswordController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,7 +55,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/subscribers/search', [SubscriberController::class, 'search'])->name('admin.subscribers.search');
  
     Route::post('/campaigns/store', [AddNewCampaignController::class, 'store'])->name('admin.campaigns.store');
-
+//   Route::get('/password/edit', [PasswordController::class, 'edit'])->name('password.edit');
+//     Route::put('/password', [PasswordController::class, 'update'])->name('password.update');
 
 });
 Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
@@ -63,7 +65,13 @@ Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
 
 Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
                 ->name('password.email');
-/*
+
+           
+Route::get('/quick-change-password', [PasswordController::class, 'showQuickChangeForm'])
+    ->name('password.quick_change');
+// Xử lý submit
+Route::post('/quick-change-password', [PasswordController::class, 'update'])
+    ->name('password.update');/*
 |--------------------------------------------------------------------------
 | User Routes
 |--------------------------------------------------------------------------

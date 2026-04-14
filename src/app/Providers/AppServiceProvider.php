@@ -11,6 +11,7 @@ use Illuminate\Pagination\Paginator;
 use App\Repositories\Interfaces\DashboardRepositoryInterface;
 use App\Repositories\DashboardRepository;
 use Illuminate\Support\Facades\App;
+use  App\Repositories\Eloquent\UserRepository;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -30,6 +31,8 @@ class AppServiceProvider extends ServiceProvider
     \App\Repositories\Interfaces\CampaignRepositoryInterface::class, 
     \App\Repositories\Eloquent\CampaignRepository::class
 );
+$this->app->bind(\App\Services\AuthService::class);
+$this->app->bind(\App\Repositories\Eloquent\UserRepository::class);
     }
 
     /**

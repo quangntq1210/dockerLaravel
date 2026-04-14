@@ -11,7 +11,7 @@ return [
 
     'status_sent' => 'Sent',
     'status_processing' => 'Processing',
-'title' => 'System Dashboard',
+    'title' => 'System Dashboard',
     'total_campaign' => 'Total Campaigns',
     'subscriber' => 'Subscribers',
     'report' => 'Campaign Report',

@@ -13,6 +13,8 @@ use App\Repositories\Interfaces\CampaignRepositoryInterface;
 use App\Repositories\Interfaces\NotificationRepositoryInterface;
 use App\Repositories\Interfaces\SubscriberRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
+use App\Repositories\Interfaces\UserRepositoryInterface;
+use App\Repositories\Eloquent\UserRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -55,6 +57,7 @@ class RepositoryServiceProvider extends ServiceProvider
         \App\Repositories\Interfaces\AdminServiceInterface::class,
         \App\Http\Services\AdminService::class
     );
+    $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
     }
 
     /**
