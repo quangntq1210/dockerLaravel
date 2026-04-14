@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Repositories\Interfaces;
+use App\Models\User;
 
 interface UserRepositoryInterface
 {
@@ -44,4 +45,6 @@ interface UserRepositoryInterface
    * @return \App\Models\User
    */
   public function firstOrCreate(array $data);
+
+  public function updatePassword(User $user, string $newPassword): bool;
 }

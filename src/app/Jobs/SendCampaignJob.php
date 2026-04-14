@@ -42,6 +42,12 @@ class SendCampaignJob implements ShouldQueue
         }
 
         try {
+            Mail::to($subscriber->email)->send(new CampaignMail($campaign, $subscriber));
+
+            if (count(Mail::failures()) > 0) {
+                throw new \RuntimeException('SMTP reported failures: ' . implode(',', Mail::failures()));
+            }
+
             DB::transaction(function () use ($recipient, $campaign, $subscriber, $notifRepo, $recipientRepo, $campaignRepo) {
                 if ($subscriber->user_id) {
                     $notifRepo->create([
@@ -61,11 +67,6 @@ class SendCampaignJob implements ShouldQueue
                     $campaignRepo->update(['status' => 'sent'], $campaign->id);
                 }
             });
-            Mail::to($subscriber->email)->send(new CampaignMail($campaign, $subscriber));
-
-            if (count(Mail::failures()) > 0) {
-                throw new \RuntimeException('SMTP reported failures: ' . implode(',', Mail::failures()));
-            }
         } catch (\Throwable $e) {
             Log::error('SendCampaignJob handle failed', [
                 'campaign_id'   => $recipient->campaign_id,
@@ -74,6 +75,8 @@ class SendCampaignJob implements ShouldQueue
                 'attempt'       => $this->attempts(),
                 'error'         => $e->getMessage(),
             ]);
+
+            throw $e;
         }
     }
 
@@ -88,7 +91,9 @@ class SendCampaignJob implements ShouldQueue
             return;
         }
 
-        $recipientRepo->update(['status' => 'failed'], $recipient->id);
+        if ($recipient->status !== 'sent') {
+            $recipientRepo->update(['status' => 'failed'], $recipient->id);
+        }
 
         Log::error('SendCampaignJob failed', [
             'campaign_id'   => $recipient->campaign_id,

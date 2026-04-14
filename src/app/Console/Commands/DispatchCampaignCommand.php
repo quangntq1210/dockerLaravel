@@ -48,7 +48,6 @@ class DispatchCampaignCommand extends Command
 
         foreach ($campaigns as $campaign) {
             if (!$this->campaignRepo->claimScheduledCampaign($campaign->id)) {
-                $this->campaignRepo->update(['status' => 'failed'], $campaign->id);
                 continue;
             }
 

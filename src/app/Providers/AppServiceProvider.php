@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\App;
+use  App\Repositories\Eloquent\UserRepository;
 
 
 class AppServiceProvider extends ServiceProvider

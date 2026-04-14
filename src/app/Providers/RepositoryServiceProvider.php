@@ -17,6 +17,7 @@ use App\Repositories\Eloquent\UserRepository;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\Interfaces\AdminServiceInterface;
 use App\Http\Services\AdminService;
+use App\Services\AuthService;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -60,6 +61,10 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             AdminServiceInterface::class,
             AdminService::class
+        );
+
+        $this->app->bind(
+            AuthService::class
         );
     }
 

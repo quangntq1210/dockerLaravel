@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -70,4 +71,16 @@ class UserRepository implements UserRepositoryInterface
   {
     return User::firstOrCreate($data);
   }
+
+  public function findByEmail(string $email)
+    {
+        return User::where('email', $email)->first();
+    }
+
+    public function updatePassword(User $user, string $newPassword): bool
+    {
+        return $user->update([
+            'password' => Hash::make($newPassword)
+        ]);
+    }
 }

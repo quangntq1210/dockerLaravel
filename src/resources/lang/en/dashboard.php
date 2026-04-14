@@ -10,6 +10,7 @@ return [
     'failed' => 'Failed',
     'status_sent' => 'Sent',
     'status_processing' => 'Processing',
+    'title_system_dashboard' => 'System Dashboard',
     'total_campaign' => 'Total Campaigns',
     'subscriber' => 'Subscribers',
     'report' => 'Campaign Report',

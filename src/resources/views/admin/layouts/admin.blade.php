@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRM - Admin</title>
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @stack('styles')
 </head>
@@ -24,6 +25,7 @@
                     <a href="/admin/campaign-scheduling" data-lang="sidebar.schedule" class="nav-link">
                         {{ __('sidebar.schedule') }}
                     </a>
+
                     <hr>
                     <form action="/logout" method="POST" class="px-3">
                         @csrf
@@ -47,6 +49,7 @@
             </div>
         </div>
     </div>
+
     <script src="{{ asset('js/app.js') }}"></script>
     <script>
         const CRM_Admin = {
@@ -92,14 +95,11 @@
                             $('#total-campaigns').text(response.stats.total_campaigns);
                             $('#total-subscribers').text(response.stats.total_subscribers);
                         }
-
-
                         if (CRM_Admin.currentLangData) {
                             CRM_Admin.applyLanguage(CRM_Admin.currentLangData);
                         }
                     },
                     error: function() {
-
                         window.location.href = url;
                     }
                 });
@@ -107,7 +107,6 @@
         };
 
         $(document).ready(function() {
-
             $('#languageSwitcher').on('change', function() {
                 const locale = $(this).val();
                 $.ajax({
@@ -118,28 +117,12 @@
                         _token: "{{ csrf_token() }}"
                     },
                     success: function(response) {
-
                         CRM_Admin.applyLanguage(response.lang);
-
-
-                        let activePageUrl = $('.pagination .active a, .pagination .active span')
-                            .first().parent().find('a').attr('href');
-
-                        if (activePageUrl) {
-                            CRM_Admin.fetchDashboardData(activePageUrl);
-                        } else {
-
-                            CRM_Admin.fetchDashboardData("{{ route('admin.dashboard') }}");
-                        }
+                        let activePageUrl = $('.pagination .active a').attr('href');
+                        CRM_Admin.fetchDashboardData(activePageUrl ||
+                            "{{ route('admin.dashboard') }}");
                     }
                 });
-            });
-
-
-            $(document).on('click', '#campaignTable .pagination a', function(e) {
-                e.preventDefault();
-                const url = $(this).attr('href');
-                CRM_Admin.fetchDashboardData(url);
             });
         });
     </script>
