@@ -92,6 +92,7 @@ return [
   "en" => "English",
   "select" => "Select",
   "subcribe_campaign" => "Subcribe Campaign",
+  "scheduled" => "Scheduled",
   "please_select_at_least_one_campaign" => "Please select at least one campaign",
   "campaign_recipients_created_successfully" => "Campaign recipients created successfully",
   'just_now'    => 'Just now',

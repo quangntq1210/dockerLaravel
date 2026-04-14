@@ -8,10 +8,8 @@ return [
     'total' => 'Total',
     'sent' => 'Sent',
     'failed' => 'Failed',
-
     'status_sent' => 'Sent',
     'status_processing' => 'Processing',
-'title' => 'System Dashboard',
     'total_campaign' => 'Total Campaigns',
     'subscriber' => 'Subscribers',
     'report' => 'Campaign Report',

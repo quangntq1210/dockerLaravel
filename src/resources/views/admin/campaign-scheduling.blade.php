@@ -20,7 +20,7 @@
     <div class="row">
         <div class="col-md-8">
             <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">{{ __('message.create_campaign_scheduling') }}</h5>
                     <button type="button" style="float:right" class="btn btn-light btn-sm fw-bold shadow-sm"
                         data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -38,7 +38,7 @@
                                 {{ __('message.campaign') }} <span class="text-danger">*</span>
                             </label>
                             <select name="campaign_id" id="campaign_id"
-                                class="form-select @error('campaign_id') is-invalid @enderror">
+                                class="form-select @error('campaign_id') is-invalid @enderror" required>
                                 <option value="">-- {{ __('message.select_campaign') }} --</option>
                                 @if ($campaigns->isEmpty())
                                     <option value="">-- {{ __('message.campaigns_dispatch_empty') }} --</option>
@@ -67,7 +67,7 @@
                             <div class="input-group mb-2">
                                 <span class="input-group-text"><i>{{ __('message.search') }}</i></span>
                                 <input type="text" id="subscriber-search" class="form-control"
-                                    placeholder="{{ __('message.search_by_name_or_email') }}">
+                                    placeholder="{{ __('message.search_by_name_or_email') }}" required>
                             </div>
 
                             {{-- Search results --}}
@@ -99,7 +99,7 @@
                             </label>
                             <input type="datetime-local" name="send_at" id="send_at"
                                 class="form-control @error('send_at') is-invalid @enderror" value="{{ old('send_at') }}"
-                                min="{{ now()->format('Y-m-d\TH:i') }}">
+                                min="{{ now()->format('Y-m-d\TH:i') }}" required>
                             @error('send_at')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -133,7 +133,7 @@
                     </ol>
                     <hr>
                     <p class="mb-1"><strong>{{ __('message.status_after_saving') }}</strong></p>
-                    <span class="badge bg-warning text-dark">scheduled</span>
+                    <span class="badge bg-warning text-dark">{{ __('message.scheduled') }}</span>
                     <p class="mt-2 text-muted">
                         {{ __('message.scheduler_will_automatically_dispatch_job_when_time_comes') }}</p>
                 </div>

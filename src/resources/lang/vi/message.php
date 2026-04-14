@@ -118,6 +118,7 @@ return [
   'login_url' => 'URL đăng nhập',
   'campaign_not_draft' => 'Chiến dịch không tồn tại hoặc không ở trạng thái nháp',
   "create_campaign" => "Tạo mới chiến dịch",
+  "scheduled" => "Đã lập lịch",
   "campaign_title" => "Tiêu đề chiến dịch",
   "enter_campaign_title" => "Nhập tiêu đề chiến dịch của bạn...",
   "campaign_content" => "Nội dung chiến dịch",
