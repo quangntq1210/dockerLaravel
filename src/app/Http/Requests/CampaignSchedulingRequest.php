@@ -27,11 +27,11 @@ class CampaignSchedulingRequest extends FormRequest
         return [
             'campaign_id' => [
                 'required',
-                'exists:campaigns,id',
+                'exists:campaigns,id'
             ],
-            'subscriber_ids' => 'required|array|min:1',
+            'subscriber_ids' => 'required|array|min:1|distinct',
             'subscriber_ids.*' => 'required|exists:subscribers,id',
-            'send_at' => 'required|date|after:now',
+            'send_at' => 'required|date|after:now'
         ];
     }
 
@@ -43,9 +43,9 @@ class CampaignSchedulingRequest extends FormRequest
     public function attributes()
     {
         return [
-            "campaign_id" => "__('validation.attributes.campaign_id')",
-            "subscriber_ids" => "__('validation.attributes.subscriber_ids')",
-            "send_at" => "__('validation.attributes.send_at')",
+            "campaign_id" => __('validation.attributes.campaigns'),
+            "subscriber_ids" => __('validation.attributes.recipients'),
+            "send_at" => __('validation.attributes.send_time'),
         ];
     }
 }
