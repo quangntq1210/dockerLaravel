@@ -14,15 +14,15 @@ class CampaignRepository implements CampaignRepositoryInterface
   * @return Campaign
   */
   public function create(array $data)
-{
-    return Campaign::create([
-        'title'      => $data['title'],
-        'body'       => $data['content'] ?? $data['body'], 
-        'status'     => $data['status'] ?? 'draft',
-        'created_by' => auth()->id() ?? 1,
-        'send_at'    => $data['send_at'] ?? now(),
-    ]);
-}
+  {
+      return Campaign::create([
+          'title'      => $data['title'],
+          'body'       => $data['content'] ?? $data['body'], 
+          'status'     => $data['status'] ?? 'draft',
+          'created_by' => auth()->id() ?? 1,
+          'send_at'    => $data['send_at'] ?? now(),
+      ]);
+  }
 
   /*
   * Update campaign by ID
@@ -101,13 +101,35 @@ class CampaignRepository implements CampaignRepositoryInterface
 
   /**
    * Get campaigns that are draft and created_at descending
-   * @return \Illuminate\Support\Collection
+   * @param $subscriberId
+   * @param $perPage
+   * @param $page
+   * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
    */
-  public function getDraftAndCreatedAtDescending()
+  public function getDraftBySubscriberId($subscriberId, $perPage = 20, $page = 1)
+  {
+      $query = Campaign::where('status', 'draft')
+          ->orderBy('created_at', 'desc');
+  
+      if ($subscriberId) {
+          $query->whereDoesntHave('recipients', function ($q) use ($subscriberId) {
+              $q->where('subscriber_id', $subscriberId)
+                ->where('status', 'draft');
+          });
+      }
+  
+      return $query->paginate($perPage, ['*'], 'page', $page);
+  }
+
+  /**
+   * Get campaigns that are draft and created_at descending
+   * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+   */
+  public function getDraftAndCreatedAtDescending($perPage = 20, $page = 1)
   {
     return Campaign::where('status', 'draft')
       ->orderBy('created_at', 'desc')
-      ->get();
+      ->paginate($perPage, ['*'], 'page', $page);
   }
 
   /*
@@ -139,5 +161,19 @@ class CampaignRepository implements CampaignRepositoryInterface
     return Campaign::where('id', $campaignId)
       ->where('status', 'scheduled')
       ->update(['status' => 'processing']) === 1;
+  }
+
+
+  /**
+   * Check if campaign exists by status
+   * @param int $campaignId
+   * @param string $status
+   * @return bool
+   */
+  public function existsByStatus(int $campaignId, string $status) : bool
+  {
+    return Campaign::where('id', $campaignId)
+    ->where('status', $status)
+    ->exists();
   }
 }

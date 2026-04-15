@@ -48,7 +48,7 @@ class DispatchCampaignCommand extends Command
 
         foreach ($campaigns as $campaign) {
             if (!$this->campaignRepo->claimScheduledCampaign($campaign->id)) {
-                return;
+                continue;
             }
 
             $recipients = $this->recipientRepo->getPendingByCampaignId($campaign->id);

@@ -4,6 +4,7 @@ namespace App\Http\Services;
 
 use App\Repositories\Eloquent\CampaignRecipientsRepository;
 use App\Repositories\Eloquent\CampaignRepository;
+use App\Exceptions\ResourceNotFoundException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
@@ -41,30 +42,69 @@ class CampaignSchedulingService
    */
   public function createCampaignScheduling($data)
   {
-    try {
-      DB::transaction(function () use ($data) {
-        $this->campaignRepo->update([
-          'send_at' => $data['send_at'],
-          'status'  => 'scheduled',
-        ], $data['campaign_id']);
+      try {
+          DB::transaction(function () use ($data) {
+              $campaignId = (int) $data['campaign_id'];
+              $sendAt = $data['send_at'];
 
-        $this->campaignRecipientsRepo->deleteByCampaignId($data['campaign_id']);
+              $this->campaignRepo->update([
+                  'send_at' => $sendAt,
+                  'status'  => 'scheduled',
+              ], $campaignId);
 
-        $recipients = array_map(fn($subscriberId) => [
-          'campaign_id'   => $data['campaign_id'],
-          'subscriber_id' => $subscriberId,
-          'status'        => 'pending',
-          'sent_at'       => null,
-          'created_at'    => now(),
-          'updated_at'    => now(),
-        ], $data['subscriber_ids']);
+              $existing = $this->campaignRecipientsRepo
+                  ->getByCampaignIdAndSubscriberIds($campaignId, $data['subscriber_ids']);
 
-        $this->campaignRecipientsRepo->createBulk($recipients);
-      });
-    } catch (\Throwable $th) {
-      DB::rollBack();
-      Log::error($th->getMessage());
-      throw $th;
-    }
+              $existingStatusBySubscriberId = [];
+              foreach ($existing as $row) {
+                  $existingStatusBySubscriberId[(int) $row->subscriber_id] = $row->status;
+              }
+
+              $now = now();
+              $toInsert = [];
+              $toPromoteDraftIds = [];
+
+              foreach ($data['subscriber_ids'] as $subscriberId) {
+                  if (!array_key_exists($subscriberId, $existingStatusBySubscriberId)) {
+                      $toInsert[] = [
+                          'campaign_id'   => $campaignId,
+                          'subscriber_id' => $subscriberId,
+                          'status'        => 'pending',
+                          'sent_at'       => null,
+                          'created_at'    => $now,
+                          'updated_at'    => $now,
+                      ];
+                      continue;
+                  }
+
+                  if ($existingStatusBySubscriberId[$subscriberId] === 'draft') {
+                      $toPromoteDraftIds[] = $subscriberId;
+                  }
+              }
+
+              if (!empty($toInsert)) {
+                  $this->campaignRecipientsRepo->createBulk($toInsert);
+              }
+
+              if (!empty($toPromoteDraftIds)) {
+                  $updated = $this->campaignRecipientsRepo->updateStatusByCampaignIdAndSubscriberIds(
+                      $campaignId,
+                      $toPromoteDraftIds,
+                      'draft',
+                      'pending'
+                  );
+
+                  if ($updated === 0) {
+                      throw new \Exception('Failed to promote draft recipients to pending');
+                  }
+              }
+          });
+      } catch (\Throwable $th) {
+          Log::error('CampaignSchedulingService createCampaignScheduling failed', [
+              'message' => $th->getMessage(),
+              'campaign_id' => $data['campaign_id'] ?? null,
+          ]);
+          throw $th;
+      }
   }
 }

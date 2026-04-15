@@ -69,4 +69,38 @@ interface CampaignRecipientsRepositoryInterface
    * @return bool
    */
   public function claimPendingRecipient(int $recipientId): bool;
+
+  /**
+   * Create campaign recipients bulk
+   * @param $userId
+   * @param $campaigns
+   * @return void
+   */
+  public function createCampaignRecipientsBulk($userId, $campaigns);
+
+  /**
+   * Check if campaign recipient exists by campaign ID and subscriber ID
+   * @param int $campaignId
+   * @param int $subscriberId
+   * @return bool
+   */
+  public function existsByCampaignIdAndSubscriberId(int $campaignId, int $subscriberId): bool;
+
+  /**
+   * Get campaign recipients by campaign ID and subscriber IDs
+   * @param int $campaignId
+   * @param array $subscriberIds
+   * @return \Illuminate\Support\Collection
+   */
+  public function getByCampaignIdAndSubscriberIds(int $campaignId, array $subscriberIds);
+
+  /**
+   * Update campaign recipients status by campaign ID and subscriber IDs
+   * @param int $campaignId
+   * @param array $subscriberIds
+   * @param string $fromStatus
+   * @param string $toStatus
+   * @return int
+   */
+  public function updateStatusByCampaignIdAndSubscriberIds(int $campaignId, array $subscriberIds, string $fromStatus, string $toStatus) : int;
 }

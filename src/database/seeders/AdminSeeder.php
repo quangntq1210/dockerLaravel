@@ -14,7 +14,7 @@ class AdminSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'admin@gmail.com'], 
             [
-                'name' => 'Admin',
+                'name' => 'Quang Admin',
                 'password' => Hash::make('12345678'), 
                 'role' => 'admin',
             ]

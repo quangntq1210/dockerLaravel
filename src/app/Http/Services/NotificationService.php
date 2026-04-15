@@ -3,7 +3,6 @@
 namespace App\Http\Services;
 
 use App\Repositories\Eloquent\NotificationRepository;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class NotificationService

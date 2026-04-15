@@ -12,9 +12,12 @@ use App\Repositories\Interfaces\CampaignRecipientsRepositoryInterface;
 use App\Repositories\Interfaces\CampaignRepositoryInterface;
 use App\Repositories\Interfaces\NotificationRepositoryInterface;
 use App\Repositories\Interfaces\SubscriberRepositoryInterface;
-use Illuminate\Support\ServiceProvider;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Eloquent\UserRepository;
+use Illuminate\Support\ServiceProvider;
+use App\Repositories\Interfaces\AdminServiceInterface;
+use App\Http\Services\AdminService;
+use App\Services\AuthService;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -49,15 +52,20 @@ class RepositoryServiceProvider extends ServiceProvider
             DashboardRepositoryInterface::class,
             DashboardRepository::class
         );
+
         $this->app->bind(
-        \App\Repositories\Interfaces\DashboardRepositoryInterface::class,
-        \App\Repositories\Eloquent\DashboardRepository::class
-    );
-    $this->app->bind(
-        \App\Repositories\Interfaces\AdminServiceInterface::class,
-        \App\Http\Services\AdminService::class
-    );
-    $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
+            UserRepositoryInterface::class,
+            UserRepository::class
+        );
+
+        $this->app->bind(
+            AdminServiceInterface::class,
+            AdminService::class
+        );
+
+        $this->app->bind(
+            AuthService::class
+        );
     }
 
     /**

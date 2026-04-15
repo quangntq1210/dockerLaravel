@@ -1,0 +1,11 @@
+@import 'app.css';
+
+@media (hover: hover) and (pointer: fine) {
+    .notification-item .dropdown-menu {
+        display: none;
+    }
+
+    .notification-item .dropdown:hover > .dropdown-menu {
+        display: block;
+    }
+}

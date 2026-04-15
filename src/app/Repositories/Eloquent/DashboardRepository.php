@@ -13,7 +13,7 @@ class DashboardRepository implements DashboardRepositoryInterface
     return Campaign::query()
         
         ->when($filters['q'] ?? null, function ($query, $search) {
-            $query->where('name', 'like', "%{$search}%");
+            $query->where('title', 'like', "%{$search}%");
         })
      
         ->when($filters['campaign_id'] ?? null, function ($query, $id) {

@@ -61,7 +61,7 @@ class CampaignSchedulingController extends Controller
         try {
             $this->campaignSchedulingService->createCampaignScheduling($data);
 
-            Cache::forget('admin.dashboard.stats');
+            Cache::tags(['dashboard'])->flush();
 
             return redirect()
                 ->route('admin.campaign-scheduling')

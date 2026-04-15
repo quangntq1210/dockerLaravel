@@ -6,4 +6,5 @@ return [
     'new_password_line' => 'Mật khẩu mới của bạn là: **:password**',
     'action' => 'Đăng nhập ngay',
     'outro' => 'Vui lòng đổi lại mật khẩu ngay sau khi đăng nhập để đảm bảo an toàn.',
+    'password_reset_sent' => 'Chúng tôi đã gửi email với mật khẩu mới cho bạn.',
 ];

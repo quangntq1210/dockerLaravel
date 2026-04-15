@@ -19,5 +19,5 @@ return [
     'new_password_line' => 'Your new password is: **:password**',
     'action' => 'Login Now',
     'outro' => 'Please change your password immediately after logging in for security.',
-
+    'password_reset_sent' => 'We have sent you an email with a new password.',
 ];
