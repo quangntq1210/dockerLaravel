@@ -5,11 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
-use App\Repositories\Interfaces\NotificationRepositoryInterface;
-use App\Repositories\Eloquent\NotificationRepository;
 use Illuminate\Pagination\Paginator;
-use App\Repositories\Interfaces\DashboardRepositoryInterface;
-use App\Repositories\DashboardRepository;
 use Illuminate\Support\Facades\App;
 use  App\Repositories\Eloquent\UserRepository;
 
@@ -23,16 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-       $this->app->bind(
-        \App\Repositories\Interfaces\AdminServiceInterface::class,
-        \App\Http\Services\AdminService::class
-    );
-    $this->app->bind(
-    \App\Repositories\Interfaces\CampaignRepositoryInterface::class, 
-    \App\Repositories\Eloquent\CampaignRepository::class
-);
-$this->app->bind(\App\Services\AuthService::class);
-$this->app->bind(\App\Repositories\Eloquent\UserRepository::class);
+        //
     }
 
     /**

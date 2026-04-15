@@ -63,6 +63,7 @@ class NotificationController extends ApiController
             [
                 'current_page' => $notifications->currentPage(),
                 'per_page'     => $notifications->perPage(),
+                'last_page'    => $notifications->lastPage(),
                 'total'        => $notifications->total(),
                 'unread_count' => $this->notificationService->getUnreadCount($userId),
             ],

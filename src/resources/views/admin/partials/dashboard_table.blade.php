@@ -42,7 +42,7 @@
     </tbody>
 </table>
 
-
+<!-- PAGINATION -->
 <div class="mt-3">
     {{ $data->appends(request()->query())->links() }}
 </div>

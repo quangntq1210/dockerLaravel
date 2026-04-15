@@ -7,6 +7,17 @@ use App\Models\Subscriber;
 
 class SubscriberRepository implements SubscriberRepositoryInterface
 {
+
+  /**
+   * Create new subscriber 
+   * @param array $data
+   * @return Subscriber
+   */
+  public function create(array $data)
+  {
+    return Subscriber::create($data);
+  }
+
   /**
    * Get all subscribers
    * @return Collection
@@ -38,5 +49,25 @@ class SubscriberRepository implements SubscriberRepositoryInterface
       ->orderBy('name')
       ->limit($limit)
       ->get(['id', 'name', 'email']);
+  }
+
+  /**
+   * Check if subscriber exists by user ID
+   * @param $userId
+   * @return Subscriber | null
+   */
+  public function getByUserId($userId)
+  {
+    return Subscriber::where('user_id', $userId)->first();
+  }
+
+  /**
+   * First or create subscriber
+   * @param array $data
+   * @return Subscriber
+   */
+  public function firstOrCreate(array $data)
+  {
+    return Subscriber::firstOrCreate($data);
   }
 }

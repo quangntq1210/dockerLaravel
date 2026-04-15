@@ -141,4 +141,64 @@ class CampaignRecipientsRepository implements CampaignRecipientsRepositoryInterf
       ->where('status', 'pending')
       ->update(['status' => 'processing']) === 1;
   }
+
+  /**
+   * Create campaign recipients bulk
+   * @param $userId
+   * @param $campaigns
+   * @return void
+   */
+  public function createCampaignRecipientsBulk($userId, $campaigns)
+  {
+    CampaignRecipient::insert(array_map(fn($campaignId) => [
+      'campaign_id' => $campaignId,
+      'subscriber_id' => $userId,
+      'status' => 'draft',
+      'sent_at' => null,
+      'created_at' => now(),
+      'updated_at' => now(),
+    ], $campaigns));
+  }
+
+  /**
+   * Check if campaign recipient exists by campaign ID and subscriber ID
+   * @param int $campaignId
+   * @param int $subscriberId
+   * @return bool
+   */
+  public function existsByCampaignIdAndSubscriberId(int $campaignId, int $subscriberId): bool
+  {
+    return CampaignRecipient::where('campaign_id', $campaignId)
+      ->where('subscriber_id', $subscriberId)
+      ->exists();
+  }
+
+  /**
+   * Get campaign recipients by campaign ID and subscriber IDs
+   * @param int $campaignId
+   * @param array $subscriberIds
+   * @return \Illuminate\Support\Collection
+   */
+  public function getByCampaignIdAndSubscriberIds(int $campaignId, array $subscriberIds)
+  {
+    return CampaignRecipient::where('campaign_id', $campaignId)
+      ->whereIn('subscriber_id', $subscriberIds)
+      ->get();
+  }
+
+  /**
+   * Update campaign recipients status by campaign ID and subscriber IDs
+   * @param int $campaignId
+   * @param array $subscriberIds
+   * @param string $fromStatus
+   * @param string $toStatus
+   * @return int
+   */
+  public function updateStatusByCampaignIdAndSubscriberIds(int $campaignId, array $subscriberIds, string $fromStatus, string $toStatus) : int
+  {
+    return CampaignRecipient::where('campaign_id', $campaignId)
+      ->whereIn('subscriber_id', $subscriberIds)
+      ->where('status', $fromStatus)
+      ->update(['status' => $toStatus]);
+  }
 }

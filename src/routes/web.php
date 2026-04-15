@@ -7,6 +7,9 @@ use App\Http\Controllers\CampaignSchedulingController;
 use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\CampaignController;
+use App\Http\Controllers\CampaignRecipientController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AddNewCampaignController;
 use App\Http\Controllers\ManagerUserController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -20,14 +23,8 @@ use App\Http\Controllers\AuthController;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    if (auth()->check()) {
-        return auth()->user()->role === 'admin'
-            ? redirect()->route('admin.dashboard')
-            : redirect()->route('notifications.index');
-    }
-    return redirect()->route('login');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::post('/subscribe', [HomeController::class, 'store'])->name('home.store');
 
 
 Route::put('/locale', [LocaleController::class, 'update'])->name('locale.update');
@@ -100,15 +97,20 @@ Route::post('/quick-change-password', [PasswordController::class, 'update'])
 */
 
 Route::middleware(['auth', 'role:user'])->group(function () {
-    
-    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/campaigns-draft', [CampaignController::class, 'getCampaignsDraft'])
+        ->name('campaigns.draft');
+    Route::post('/campaigns-recipients', [CampaignRecipientController::class, 'storeBulk'])
+        ->name('campaigns.recipients.store.bulk');
+    Route::get('/notifications', [NotificationController::class, 'index'])
+        ->name('notifications.index');
 
     Route::prefix('api/user')->group(function () {
         Route::get('/notifications', [NotificationController::class, 'list'])->name('api.user.notifications.list');
-        Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('api.user.notifications.unread-count');
         Route::put('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('api.user.notifications.read-all');
         Route::put('/notifications/read/{id?}', [NotificationController::class, 'markAsRead'])->name('api.user.notifications.read');
         Route::put('/notifications/unread/{id?}', [NotificationController::class, 'markAsUnread'])->name('api.user.notifications.unread');
         Route::delete('/notifications/{id?}', [NotificationController::class, 'destroy'])->name('api.user.notifications.destroy');
     });
 });
+
+require __DIR__.'/auth.php';

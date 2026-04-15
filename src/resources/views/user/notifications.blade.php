@@ -37,7 +37,8 @@
             </ul>
 
             {{-- Toast notification --}}
-            <div id="toast-container" class="position-fixed top-0 end-0 p-3" style="z-index: 9999"></div>
+            <div id="toast-container" class="position-fixed top-0 end-0 p-2 d-flex flex-column gap-2"
+                style="z-index: 9999; margin-top: 55px;"></div>
 
             {{-- Notification list --}}
             <div class="card shadow-sm border-0">
@@ -57,29 +58,94 @@
                 <ul class="pagination" id="pagination-list">
                 </ul>
             </nav>
+
+            {{-- Table Campaign --}}
+            <h4 class="fw-bold mb-0">
+                {{ __('message.campaigns') }}
+            </h4>
+
+            <div id="campaign-table">
+                <table class="table table-bordered table-hover mt-3">
+                    <thead class="table-light">
+                        <tr>
+                            <th><input type="checkbox" id="select-all-campaigns"></th>
+                            <th style="font-size: 14px">{{ __('message.title') }}</th>
+                            <th style="font-size: 14px">{{ __('message.body') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody id="campaign-table-body">
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div class="d-flex justify-content-between align-items-center mt-2">
+                {{-- Pagination Campaign --}}
+                <nav aria-label="{{ __('message.pagination') }}" class="d-flex justify-content-center mt-2"
+                    id="pagination-campaign-wrap">
+                    <ul class="pagination" id="pagination-campaign-list">
+                    </ul>
+                </nav>
+
+                {{-- Button Send Campaign --}}
+                <div class="d-flex justify-content-end mt-2">
+                    <button class="btn btn-primary" id="btn-send-campaign">
+                        {{ __('message.subcribe_campaign') }}
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
 
 @push('scripts')
     <script>
-        let FirstCount =0;
+        let FirstCount = 0;
         $(function() {
-            let currentPage = 1;
-            let currentFilter = 'all';
-            let isLoading = false;
+            const state = {
+                notifications: {
+                    page: 1,
+                    filter: 'all',
+                    loading: false,
+                    perPage: 7
+                },
+                campaigns: {
+                    page: 1,
+                    lastPage: 1,
+                    loading: false,
+                    perPage: 7
+                }
+            };
 
-            // Load notifications
-            loadNotifications(1, 'all', false);
+            const $notificationList = $('#notification-list');
+            const $notificationPager = $('#pagination-list');
+            const $notificationWrap = $('#pagination-wrap');
+
+            const $campaignBody = $('#campaign-table-body');
+            const $campaignPager = $('#pagination-campaign-list');
+            const $campaignWrap = $('#pagination-campaign-wrap');
+
+            // Load notifications & campaigns
+            loadNotifications(1, state.notifications.filter);
+            loadCampaigns(1);
+
+            // Select all campaigns
+            $('#select-all-campaigns').on('change', function(e) {
+                e.preventDefault();
+                const isChecked = $(this).prop('checked');
+                $campaignBody.find('input[type="checkbox"]').prop('checked', isChecked);
+            });
 
             // Change tab
             $('#notification-tabs .nav-link').on('click', function(e) {
                 e.preventDefault();
                 $('#notification-tabs .nav-link').removeClass('active');
                 $(this).addClass('active');
-                currentFilter = $(this).data('filter');
-                currentPage = 1;
-                loadNotifications(1, currentFilter, false);
+
+                state.notifications.filter = $(this).data('filter');
+                state.notifications.page = 1;
+
+                loadNotifications(state.notifications.page, state.notifications.filter);
             });
 
             // Load more notifications
@@ -88,8 +154,20 @@
                 const $li = $(this).closest('.page-item');
                 if ($li.hasClass('disabled') || $li.hasClass('active')) return;
 
-                currentPage = parseInt($(this).data('page'));
-                loadNotifications(currentPage, currentFilter, false);
+                state.notifications.page = Number($(this).data('page')) || 1;
+
+                loadNotifications(state.notifications.page, state.notifications.filter);
+            });
+
+            // Load more campaigns
+            $(document).on('click', '#pagination-campaign-list .page-link', function(e) {
+                e.preventDefault();
+                const $li = $(this).closest('.page-item');
+                if ($li.hasClass('disabled') || $li.hasClass('active')) return;
+
+                state.campaigns.page = Number($(this).data('page')) || 1;
+
+                loadCampaigns(state.campaigns.page);
             });
 
             // Mark all as read
@@ -103,6 +181,7 @@
                         $('.notification-item').removeClass('unread').css('background', '');
                         $('.notification-item').find('.dot-read').removeClass(
                             'bg-primary rounded-circle');
+
                         updateUnreadBadge(0);
                         showToast(res.message, 'success');
                     },
@@ -120,8 +199,8 @@
                 const $item = $(this).closest('.notification-item');
                 const id = $item.data('id');
                 const isRead = String($item.data('read')) === '1';
-                const endpoint = isRead ? @js(route('api.user.notifications.read')) + '/' + id :
-                    @js(route('api.user.notifications.unread')) + '/' + id;
+                const endpoint = isRead ? @js(route('api.user.notifications.unread')) + '/' + id :
+                    @js(route('api.user.notifications.read')) + '/' + id;
 
                 $.ajax({
                     url: endpoint,
@@ -133,9 +212,9 @@
                             $item.find('.dot-read').removeClass('bg-primary rounded-circle');
                             $item.find('.btn-toggle-read').contents().last().replaceWith(
                                 `{{ __('message.notification_mark_as_unread') }}`);
-                            
-                            updateUnreadBadge(FirstCount - 1);
-                            console.log("count1",FirstCount);
+                            let count = parseInt($('#unread-badge').text()) || 0;
+
+                            updateUnreadBadge(count - 1);
                         } else {
                             // Change to unread
                             $item.addClass('unread').css('background', '#e7f3ff').data('read',
@@ -143,9 +222,9 @@
                             $item.find('.dot-read').addClass('bg-primary rounded-circle');
                             $item.find('.btn-toggle-read').contents().last().replaceWith(
                                 `{{ __('message.notification_mark_as_read') }}`);
-                      
-                          updateUnreadBadge(FirstCount + 1);
-                           console.log("count2",FirstCount);
+                            let count = parseInt($('#unread-badge').text()) || 0;
+
+                            updateUnreadBadge(count + 1);
                         }
                         // showToast(res.message, 'success');
                     },
@@ -177,49 +256,120 @@
                 });
             });
 
+            // Send campaign
+            $('#btn-send-campaign').on('click', function(e) {
+                e.preventDefault();
+                const campaigns = $campaignBody.find('input[type="checkbox"]:checked').map(function() {
+                    return $(this).data('id');
+                }).toArray();
+
+                if (campaigns.length === 0) {
+                    showToast(@js(__('message.please_select_at_least_one_campaign')), 'danger');
+                    return;
+                }
+
+                $.ajax({
+                    url: @js(route('campaigns.recipients.store.bulk')),
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        campaigns: campaigns
+                    }),
+                    success: function(res) {
+                        showToast(res.message, 'success');
+
+                        const currentPageCount = $('#campaign-table-body .campaign-checkbox')
+                            .length;
+
+                        if (currentPageCount == campaigns.length && state.campaigns.page ==
+                            state.campaigns.lastPage) {
+                            loadCampaigns(state.campaigns.page - 1);
+                        } else {
+                            loadCampaigns(state.campaigns.page);
+                        }
+
+                        $('#select-all-campaigns').prop('checked', false);
+                    },
+                    error: function(res) {
+                        showToast(res?.responseJSON?.errors?.campaigns[0] ||
+                            @js(__('message.error_occurred')), 'danger');
+                    }
+                });
+            });
+
             // Load notifications
-            function loadNotifications(page, filter, append) {
-                if (isLoading) return;
-                isLoading = true;
+            function loadNotifications(page, filter) {
+                if (state.notifications.loading) return;
+                state.notifications.loading = true;
 
                 const params = {
                     page: page,
-                    per_page: 7
+                    per_page: state.notifications.perPage
                 };
+
                 if (filter === 'unread') params.unread = 1;
 
                 $.get(@js(route('api.user.notifications.list')), params)
                     .done(function(res) {
-                        if (!append) {
-                            $('#notification-list').empty();
-                        }
+                        $notificationList.empty();
 
-                        if (res.data.length === 0 && !append) {
-                            $('#notification-list').html(
+                        if (res.data.length === 0) {
+                            $notificationList.html(
                                 '<div class="text-center py-5 text-muted">' +
                                 '<i class="bi bi-bell-slash fs-2 d-block mb-2"></i>' +
                                 `{{ __('message.notification_empty') }}` + '</div>'
                             );
-                            $('#pagination-list').empty();
-                            $('#pagination-wrap').hide();
-                            updateUnreadBadge(res.meta.unread_count);
+                            $notificationPager.empty();
+                            $notificationWrap.hide();
+                            updateUnreadBadge(res?.meta?.unread_count || 0);
                             return;
                         }
 
-                        $.each(res.data, function(i, item) {
-                            $('#notification-list').append(renderItem(item));
-                        });
-
+                        res.data.forEach(item => $notificationList.append(renderItem(item)));
                         renderPagination(res.meta, '#pagination-list', '#pagination-wrap');
-
-                        updateUnreadBadge(res.meta.unread_count);
+                        updateUnreadBadge(res?.meta?.unread_count || 0);
                     })
                     .fail(function(res) {
                         showToast(res.responseJSON.message, 'danger');
                     })
                     .always(function() {
-                        $('#loading-spinner').hide();
-                        isLoading = false;
+                        state.notifications.loading = false;
+                    });
+            }
+
+            // Load campaigns
+            function loadCampaigns(page) {
+                if (state.campaigns.loading) return;
+                state.campaigns.loading = true;
+
+                const params = {
+                    page: page,
+                    per_page: state.campaigns.perPage
+                };
+
+                $.get(@js(route('campaigns.draft')), params)
+                    .done(function(res) {
+                        $campaignBody.empty();
+
+                        if (!res?.data?.length) {
+                            $campaignBody.html(
+                                `<tr><td colspan="3" class="text-center text-muted py-4">{{ __('message.campaigns_empty') }}</td></tr>`
+                            );
+                            $campaignPager.empty();
+                            $campaignWrap.hide();
+                            return;
+                        }
+
+                        state.campaigns.lastPage = res?.meta?.last_page || 1;
+
+                        res.data.forEach(item => $campaignBody.append(renderCampaignTable(item)));
+                        renderPagination(res.meta, '#pagination-campaign-list', '#pagination-campaign-wrap');
+                    })
+                    .fail(function(res) {
+                        showToast(res?.responseJSON?.message || @js(__('message.error_occurred')), 'danger');
+                    })
+                    .always(function() {
+                        state.campaigns.loading = false;
                     });
             }
 
@@ -291,6 +441,17 @@
       </div>`;
             }
 
+            // Render campaign table
+            function renderCampaignTable(data) {
+                return `
+                    <tr id="campaign-table-row-${data.id}">
+                        <td style="font-size:13px;line-height:1.4;"><input type="checkbox" class="form-check-input campaign-checkbox" data-id="${data.id}"></td>
+                        <td style="font-size:13px;line-height:1.4;">${data.title}</td>
+                        <td style="font-size:13px;line-height:1.4;">${data.body}</td>
+                    </tr>
+                `
+            }
+
             // Update unread badge
             function updateUnreadBadge(count) {
                 FirstCount = count;
@@ -298,6 +459,7 @@
                     $('#unread-badge').text(count).show();
                 } else {
                     $('#unread-badge').hide();
+                    $('#unread-badge').text('');
                 }
             }
         });
