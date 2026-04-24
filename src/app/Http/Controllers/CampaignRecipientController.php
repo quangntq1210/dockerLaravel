@@ -42,7 +42,7 @@ class CampaignRecipientController extends ApiController
 
     /**
      * Create campaign recipients bulk
-     * @param Request $request
+     * @param CampaignRecipientRequest $campaignRecipientRequest
      * @return \Illuminate\Http\JsonResponse
      */
     public function storeBulk(CampaignRecipientRequest $campaignRecipientRequest) {

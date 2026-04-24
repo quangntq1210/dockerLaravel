@@ -77,6 +77,8 @@ body {
     cursor: pointer;
     font-size: 0.9rem;
     transition: all 0.2s;
+    -webkit-appearance: none;
+    -moz-appearance: none;
     appearance: none;
     /* Ẩn mũi tên mặc định để custom hoặc dùng icon */
 }

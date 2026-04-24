@@ -4,22 +4,26 @@ namespace App\Http\Services;
 
 use App\Repositories\Interfaces\CampaignRecipientsRepositoryInterface;
 use App\Repositories\Interfaces\SubscriberRepositoryInterface;
-
+use App\Repositories\Interfaces\NotificationRepositoryInterface;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 class CampaignRecipientService
 {
     protected $campaignRecipientsRepo;
     protected $subscriberRepo;
-    
+    protected $notificationRepo;
     /**
      * Constructor
      * @param CampaignRecipientsRepositoryInterface $campaignRecipientsRepo
      * @param SubscriberRepositoryInterface $subscriberRepo
+     * @param NotificationRepositoryInterface $notificationRepo
      * @return void
      */
-    public function __construct(CampaignRecipientsRepositoryInterface $campaignRecipientsRepo, SubscriberRepositoryInterface $subscriberRepo)
+    public function __construct(CampaignRecipientsRepositoryInterface $campaignRecipientsRepo, SubscriberRepositoryInterface $subscriberRepo, NotificationRepositoryInterface $notificationRepo)
     {
         $this->campaignRecipientsRepo = $campaignRecipientsRepo;
         $this->subscriberRepo = $subscriberRepo;
+        $this->notificationRepo = $notificationRepo;
     }
 
     /**
@@ -42,7 +46,28 @@ class CampaignRecipientService
 
         $subscriberId = $subscriber->id;
 
-        return $this->campaignRecipientsRepo->createCampaignRecipientsBulk($subscriberId, $campaigns);
+        try {
+            DB::transaction(function () use ($subscriberId, $campaigns, $userId) {
+                $this->campaignRecipientsRepo->createCampaignRecipientsBulk($subscriberId, $campaigns);
+                $this->notificationRepo->create([
+                    'user_id' => $userId,
+                    'campaign_id' => $campaigns[0],
+                    'title' => 'Campaign Subscribed',
+                    'message' => 'You have subscribed to the campaign',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            });
+        } catch (\Throwable $th) {
+            Log::error('CampaignRecipientService createCampaignRecipientsBulk failed', [
+                'message' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+                'campaigns' => $campaigns,
+                'subscriber_id' => $subscriberId,
+                'user_id' => $userId,
+            ]);
+            throw $th;
+        }
     }
 
     /**

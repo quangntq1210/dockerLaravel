@@ -31,7 +31,7 @@
                     <div class="col-12 col-md-6 col-xl-4">
                         <article class="campaign-card campaign-detail-trigger" id="campaign-card-{{ $campaign->id }}"
                             data-campaign-title="{{ $campaign->title }}" data-campaign-body="{{ $campaign->body }}"
-                            data-campaign-status="{{ $isSubscribed ? __('message.subscribed') : __('message.not_subscribed') }}">
+                            data-campaign-status="{{ $isSubscribed ? __('message.interested') : __('message.not_interested') }}">
                             <div class="campaign-card-image-wrap">
                                 <div class="campaign-card-placeholder">
                                     <i class="bi bi-image"></i>
@@ -45,7 +45,7 @@
                                         <span
                                             class="badge campaign-status-badge {{ $isSubscribed ? 'campaign-status-subscribed' : 'campaign-status-unsubscribed' }}"
                                             data-role="status">
-                                            {{ $isSubscribed ? __('message.subscribed') : __('message.not_subscribed') }}
+                                            {{ $isSubscribed ? __('message.interested') : __('message.not_interested') }}
                                         </span>
                                     @endauth
                                 </div>
@@ -60,14 +60,14 @@
                                         data-campaign-id="{{ $campaign->id }}"
                                         data-subscribed="{{ $isSubscribed ? '1' : '0' }}">
                                         <span class="campaign-action-label">
-                                            {{ $isSubscribed ? __('message.unsubscribe') : __('message.subscribe') }}
+                                            {{ $isSubscribed ? __('message.remove_interest') : __('message.mark_interest') }}
                                         </span>
                                     </button>
                                 @else
                                     <button type="button"
                                         class="btn btn-primary campaign-action-btn mt-auto guest-subscription-trigger"
                                         data-campaign-id="{{ $campaign->id }}">
-                                        {{ __('message.subscribe') }} / {{ __('message.unsubscribe') }}
+                                        {{ __('message.mark_interest') }} / {{ __('message.remove_interest') }}
                                     </button>
                                 @endauth
                             </div>
@@ -87,8 +87,8 @@
                         <div class="modal-content campaign-detail-modal-content">
                             <form id="guest-subscribe-form" novalidate>
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="guestSubscribeModalLabel">{{ __('message.subscribe') }} /
-                                        {{ __('message.unsubscribe') }}</h5>
+                                    <h5 class="modal-title" id="guestSubscribeModalLabel">{{ __('message.mark_interest') }} /
+                                        {{ __('message.remove_interest') }}</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                         aria-label="Close"></button>
                                 </div>
@@ -105,8 +105,8 @@
                                     <div class="mb-0">
                                         <label for="guest-action" class="form-label">{{ __('message.action') }}</label>
                                         <select id="guest-action" name="action" class="form-select">
-                                            <option value="subscribe">{{ __('message.subscribe') }}</option>
-                                            <option value="unsubscribe">{{ __('message.unsubscribe') }}</option>
+                                            <option value="subscribe">{{ __('message.mark_interest') }}</option>
+                                            <option value="unsubscribe">{{ __('message.remove_interest') }}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -282,14 +282,14 @@
                             $status
                                 .toggleClass('campaign-status-subscribed', nowSubscribed)
                                 .toggleClass('campaign-status-unsubscribed', !nowSubscribed)
-                                .text(nowSubscribed ? @js(__('message.subscribed')) :
-                                    @js(__('message.not_subscribed')));
+                                .text(nowSubscribed ? @js(__('message.interested')) :
+                                    @js(__('message.not_interested')));
                             $card.attr('data-campaign-status', nowSubscribed ?
-                                @js(__('message.subscribed')) :
-                                @js(__('message.not_subscribed')));
+                                @js(__('message.interested')) :
+                                @js(__('message.not_interested')));
 
-                            $label.text(nowSubscribed ? @js(__('message.unsubscribe')) :
-                                @js(__('message.subscribe')));
+                            $label.text(nowSubscribed ? @js(__('message.remove_interest')) :
+                                @js(__('message.mark_interest')));
                             showActionToast('success', response?.message || (nowSubscribed ?
                                 subscribeSuccessText :
                                 unsubscribeSuccessText));

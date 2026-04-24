@@ -29130,10 +29130,32 @@ module.exports = function(module) {
 
 /***/ }),
 
+/***/ "./resources/css/admin.css":
+/*!*********************************!*\
+  !*** ./resources/css/admin.css ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+
 /***/ "./resources/css/app.css":
 /*!*******************************!*\
   !*** ./resources/css/app.css ***!
   \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+
+/***/ "./resources/css/user.css":
+/*!********************************!*\
+  !*** ./resources/css/user.css ***!
+  \********************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -29154,7 +29176,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var bootstrap_dist_js_bootstrap_bundle_min_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! bootstrap/dist/js/bootstrap.bundle.min.js */ "./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js");
 /* harmony import */ var bootstrap_dist_js_bootstrap_bundle_min_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(bootstrap_dist_js_bootstrap_bundle_min_js__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _helpers_formatTimeAgo_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./helpers/formatTimeAgo.js */ "./resources/js/helpers/formatTimeAgo.js");
+/* harmony import */ var _helpers_showToast_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./helpers/showToast.js */ "./resources/js/helpers/showToast.js");
+var _bootstrap$default;
 
+
+window.bootstrap = (_bootstrap$default = bootstrap_dist_js_bootstrap_bundle_min_js__WEBPACK_IMPORTED_MODULE_1___default.a === null || bootstrap_dist_js_bootstrap_bundle_min_js__WEBPACK_IMPORTED_MODULE_1___default.a === void 0 ? void 0 : bootstrap_dist_js_bootstrap_bundle_min_js__WEBPACK_IMPORTED_MODULE_1___default.a["default"]) !== null && _bootstrap$default !== void 0 ? _bootstrap$default : bootstrap_dist_js_bootstrap_bundle_min_js__WEBPACK_IMPORTED_MODULE_1___default.a;
 
 
 
@@ -29197,33 +29223,121 @@ jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajaxSetup({
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+var t = window.timeAgoI18n || {};
+var withCount = function withCount(template, count) {
+  return String(template || '').replace(':count', count);
+};
 var formatTimeAgo = function formatTimeAgo(dateStr) {
   var now = new Date();
   var date = new Date(dateStr);
   var diffMs = now - date;
   var diffMins = Math.floor(diffMs / 60000);
-  if (diffMins < 1) return 'Vừa xong';
-  if (diffMins < 60) return diffMins + ' phút trước';
+  if (diffMins < 1) return t.just_now || 'Just now';
+  if (diffMins < 60) return withCount(t.minutes_ago || ':count minutes ago', diffMins);
   var diffHours = Math.floor(diffMins / 60);
-  if (diffHours < 24) return diffHours + ' giờ trước';
+  if (diffHours < 24) return withCount(t.hours_ago || ':count hours ago', diffHours);
   var diffDays = Math.floor(diffHours / 24);
-  if (diffDays < 7) return diffDays + ' ngày trước';
-  return date.toLocaleDateString('vi-VN');
+  if (diffDays < 7) return withCount(t.days_ago || ':count days ago', diffDays);
+  return date.toLocaleDateString(t.locale === 'vi' ? 'vi-VN' : 'en-US');
 };
 /* harmony default export */ __webpack_exports__["default"] = (formatTimeAgo);
 window.formatTimeAgo = formatTimeAgo;
 
 /***/ }),
 
+/***/ "./resources/js/helpers/showToast.js":
+/*!*******************************************!*\
+  !*** ./resources/js/helpers/showToast.js ***!
+  \*******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+var TYPE_TO_COLOR = {
+  success: 'success',
+  danger: 'danger',
+  error: 'danger',
+  warning: 'warning',
+  info: 'info',
+  secondary: 'secondary',
+  primary: 'primary',
+  light: 'light',
+  dark: 'dark'
+};
+var LIGHT_BACKGROUNDS = new Set(['warning', 'light']);
+function resolveColor(type) {
+  if (type == null || type === '') {
+    return 'primary';
+  }
+  var key = String(type).toLowerCase();
+  return TYPE_TO_COLOR[key] || key;
+}
+function escapeHtml(text) {
+  if (text == null) {
+    return '';
+  }
+  var div = document.createElement('div');
+  div.textContent = String(text);
+  return div.innerHTML;
+}
+function getToastContainer() {
+  var el = document.getElementById('toast-container');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'toast-container';
+    el.className = 'toast-container position-fixed top-0 end-0 p-3';
+    el.style.zIndex = '1090';
+    document.body.appendChild(el);
+  }
+  return el;
+}
+function showToast(message) {
+  var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'success';
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  var _options$delay = options.delay,
+    delay = _options$delay === void 0 ? 3500 : _options$delay,
+    _options$autohide = options.autohide,
+    autohide = _options$autohide === void 0 ? true : _options$autohide;
+  var color = resolveColor(type);
+  var closeWhite = !LIGHT_BACKGROUNDS.has(color);
+  var id = "toast-".concat(Date.now(), "-").concat(Math.random().toString(36).slice(2, 11));
+  var container = getToastContainer();
+  var toastEl = document.createElement('div');
+  toastEl.id = id;
+  toastEl.className = "toast align-items-center text-bg-".concat(color, " border-0");
+  toastEl.setAttribute('role', 'alert');
+  toastEl.setAttribute('aria-live', 'assertive');
+  toastEl.setAttribute('aria-atomic', 'true');
+  var closeClass = closeWhite ? 'btn-close btn-close-white' : 'btn-close';
+  toastEl.innerHTML = "\n        <div class=\"d-flex\">\n            <div class=\"toast-body\">".concat(escapeHtml(message), "</div>\n            <button type=\"button\" class=\"").concat(closeClass, " me-2 m-auto\" data-bs-dismiss=\"toast\" aria-label=\"Close\"></button>\n        </div>\n    ");
+  container.appendChild(toastEl);
+  var toast = new bootstrap.Toast(toastEl, {
+    autohide: autohide,
+    delay: delay
+  });
+  toastEl.addEventListener('hidden.bs.toast', function () {
+    toast.dispose();
+    toastEl.remove();
+  });
+  toast.show();
+}
+/* harmony default export */ __webpack_exports__["default"] = (showToast);
+window.showToast = showToast;
+
+/***/ }),
+
 /***/ 0:
-/*!***********************************************************!*\
-  !*** multi ./resources/js/app.js ./resources/css/app.css ***!
-  \***********************************************************/
+/*!**************************************************************************************************************!*\
+  !*** multi ./resources/js/app.js ./resources/css/app.css ./resources/css/user.css ./resources/css/admin.css ***!
+  \**************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /home/vu-cong-thang/Documents/Projects/dockerLaravel/src/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /home/vu-cong-thang/Documents/Projects/dockerLaravel/src/resources/css/app.css */"./resources/css/app.css");
+__webpack_require__(/*! /home/vu-cong-thang/Documents/Projects/test-readme/src/resources/js/app.js */"./resources/js/app.js");
+__webpack_require__(/*! /home/vu-cong-thang/Documents/Projects/test-readme/src/resources/css/app.css */"./resources/css/app.css");
+__webpack_require__(/*! /home/vu-cong-thang/Documents/Projects/test-readme/src/resources/css/user.css */"./resources/css/user.css");
+module.exports = __webpack_require__(/*! /home/vu-cong-thang/Documents/Projects/test-readme/src/resources/css/admin.css */"./resources/css/admin.css");
 
 
 /***/ })
