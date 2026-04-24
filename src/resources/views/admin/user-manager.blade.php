@@ -63,6 +63,25 @@
         font-size: 0.75rem;
         padding: 5px 10px;
     }
+    .delete-btn {
+    border: none;
+    background: transparent;
+    color: #dc3545;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    padding: 6px;
+    border-radius: 6px;
+}
+
+.delete-btn:hover {
+    background: #dc3545;
+    color: #fff;
+    transform: scale(1.1);
+}
+
+.delete-btn:active {
+    transform: scale(0.95);
+}
 </style>
 @endpush
 
@@ -155,6 +174,12 @@
             </td>
             <td><span class="badge ${roleBadge} text-uppercase">${user.role}</span></td>
             <td>${verifiedAt}</td>
+            <td>
+   <button class="btn btn-sm btn-outline-danger delete-btn"
+        onclick="deleteUser(${user.id}, ${user.role === 'admin'})">
+    <i class="fas fa-trash"></i>
+</button>
+</td>
         `;
         tbody.appendChild(tr);
     });
@@ -199,7 +224,42 @@
             icon.classList.replace('fa-eye-slash', 'fa-eye');
         }
     }
-
     document.addEventListener('DOMContentLoaded', () => fetchUsers(1));
+
+    async function deleteUser(id, isAdmin = false) {
+    if (isAdmin) {
+        alert("Không thể xoá tài khoản admin!");
+        return;
+    }
+
+    if (!confirm("Bạn có chắc muốn xoá user này?")) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`{{ route('admin.users.delete') }}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({ id: id })
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+            alert(result.message);
+
+            // reload lại bảng
+            fetchUsers(currentPage);
+        } else {
+            alert(result.message || "Xoá thất bại");
+        }
+
+    } catch (error) {
+        alert("Lỗi server, vui lòng thử lại");
+    }
+}
 </script>
 @endpush

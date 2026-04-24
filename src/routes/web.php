@@ -65,7 +65,25 @@ Route::controller(LoginController::class)->group(function () {
 // });
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     
+  
+    
+    Route::get('/users', [ManagerUserController::class, 'index'])
+        ->name('users.index');
+
+    Route::get('/api/users', [ManagerUserController::class, 'getData'])
+        ->name('users.data');
+
+  
+    Route::delete('/users/delete', [ManagerUserController::class, 'delete'])
+        ->name('users.delete');
+
    
+    Route::put('/users/restore', [ManagerUserController::class, 'restore'])
+        ->name('users.restore');
+
+
+    Route::delete('/users/force-delete', [ManagerUserController::class, 'forceDelete'])
+        ->name('users.forceDelete');
     Route::get('/users', [ManagerUserController::class, 'index'])->name('users.index');
     
   

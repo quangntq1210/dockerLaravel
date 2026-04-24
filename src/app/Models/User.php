@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
-
+  use SoftDeletes;
     const ROLE_USER = 'user';
     const ROLE_ADMIN = 'admin';
     const ROLES = [
@@ -25,7 +25,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name', 'email', 'password', 'role',
     ];
-
+ protected $dates = ['deleted_at'];
     /**
      * The attributes that should be hidden for arrays.
      *
