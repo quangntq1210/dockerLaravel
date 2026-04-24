@@ -62,6 +62,16 @@ class SubscriberRepository implements SubscriberRepositoryInterface
   }
 
   /**
+   * Get subscriber by email.
+   * @param string $email
+   * @return Subscriber | null
+   */
+  public function getByEmail(string $email)
+  {
+    return Subscriber::where('email', $email)->first();
+  }
+
+  /**
    * First or create subscriber
    * @param array $data
    * @return Subscriber

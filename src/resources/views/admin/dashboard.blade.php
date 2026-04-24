@@ -63,15 +63,3 @@
         </div>
     </div>
 @endsection
-
-@push('scripts')
-    <!-- <script src="{{ asset('js/dashboard-manager.js') }}"></script>  -->
-    <script>
-        // $(document).ready(function () {
-        //     DashboardManager.init({
-        //         localeUpdateUrl: "{{ route('locale.update') }}",
-        //         csrfToken: "{{ csrf_token() }}"
-        //     });
-        // });
-    </script>
-@endpush

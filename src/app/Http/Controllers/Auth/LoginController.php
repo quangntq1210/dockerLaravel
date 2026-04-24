@@ -46,6 +46,13 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/login');
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => 'success',
+            ]);
+        }
+
+        return redirect()->back();
     }
 }

@@ -16,11 +16,16 @@ class LocaleController extends Controller
 
     public function update(UpdateLocaleRequest $request)
     {
-        $this->localeService->persistLocale($request->locale);
+        $locale = (string) $request->input('locale');
+        $this->localeService->persistLocale($locale);
+
+        if (! $request->expectsJson()) {
+            return redirect()->back();
+        }
 
         return response()->json([
             'status' => 'success',
-            'lang'   => $this->localeService->getTranslations($request->locale)
+            'lang'   => $this->localeService->getTranslations($locale)
         ]);
     }
 }

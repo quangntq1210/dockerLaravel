@@ -2,6 +2,7 @@
 
 namespace App\Http\Services;
 
+use App\Models\Campaign;
 use App\Repositories\Interfaces\CampaignRepositoryInterface;
 use App\Repositories\Interfaces\SubscriberRepositoryInterface;
 use App\Repositories\Interfaces\CampaignRecipientsRepositoryInterface;
@@ -46,6 +47,64 @@ class HomeService
     public function getCampaignsDraft($perPage = 10, $page = 1)
     {
         return $this->campaignRepo->getDraftAndCreatedAtDescending($perPage, $page);
+    }
+
+    /**
+     * Get campaigns for home page (draft + scheduled).
+     * @param int $perPage
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function getCampaignsForHome(int $perPage = 12)
+    {
+        return Campaign::query()
+            ->whereIn('status', ['draft', 'scheduled'])
+            ->orderByDesc('created_at')
+            ->paginate($perPage);
+    }
+
+    /**
+     * Get campaigns for guest users.
+     * @param int $perPage
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function getCampaignsForGuest(int $perPage = 12)
+    {
+        return Campaign::query()
+            ->where('status', 'draft')
+            ->orderByDesc('created_at')
+            ->paginate($perPage);
+    }
+
+    /**
+     * Get campaigns for authenticated users.
+     * @param int $perPage
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function getCampaignsForAuth(int $perPage = 12)
+    {
+        return Campaign::query()
+            ->whereIn('status', ['draft', 'scheduled', 'sent'])
+            ->orderByDesc('created_at')
+            ->paginate($perPage);
+    }
+
+    /**
+     * Get subscribed campaign ids of current user.
+     * @param int|null $userId
+     * @return array<int>
+     */
+    public function getSubscribedCampaignIdsByUserId(?int $userId): array
+    {
+        if (!$userId) {
+            return [];
+        }
+
+        $subscriber = $this->subscriberRepo->getByUserId($userId);
+        if (!$subscriber) {
+            return [];
+        }
+
+        return $subscriber->campaigns()->pluck('campaign_id')->toArray();
     }
     
 
@@ -126,5 +185,45 @@ class HomeService
             ]);
             throw $th;
         }
+    }
+
+    /**
+     * Unsubscribe guest/user by provided subscriber information.
+     * @param array $data
+     * @return int
+     */
+    public function unsubscribeCampaignRecipientsBulk(array $data): int
+    {
+        $subscriber = $this->subscriberRepo->getByEmail($data['email']);
+        if (!$subscriber) {
+            return 0;
+        }
+
+        if (strcasecmp((string) $subscriber->name, (string) $data['name']) !== 0) {
+            return 0;
+        }
+
+        $deleted = 0;
+        foreach ($data['campaign_ids'] as $campaignId) {
+            $deleted += $this->campaignRecipientsRepo->deleteByCampaignIdAndSubscriberId((int) $campaignId, (int) $subscriber->id);
+        }
+
+        return $deleted;
+    }
+
+
+    /**
+     * Delete campaign recipients by provided subscriber information.
+     * @param array $data
+     * @return int
+     */
+    public function deleteCampaignRecipients(array $data): int
+    {
+        $subscriber = $this->subscriberRepo->getByEmail($data['email']);
+        if (!$subscriber) {
+            return 0;
+        }
+
+        return $this->campaignRecipientsRepo->deleteByCampaignIdAndSubscriberId($data['campaign_id'], $subscriber->id);
     }
 }

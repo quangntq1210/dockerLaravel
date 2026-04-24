@@ -39,6 +39,13 @@ interface SubscriberRepositoryInterface
   public function getByUserId($userId);
 
   /**
+   * Get subscriber by email.
+   * @param string $email
+   * @return \App\Models\Subscriber | null
+   */
+  public function getByEmail(string $email);
+
+  /**
    * First or create subscriber
    * @param array $data
    * @return \Illuminate\Database\Eloquent\Model

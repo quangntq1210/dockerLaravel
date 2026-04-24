@@ -25,7 +25,7 @@ class HomeRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:subscribers,email|max:255',
+            'email' => 'required|email|max:255',
             'campaign_ids' => 'required|array|min:1',
             'campaign_ids.*' => 'integer|exists:campaigns,id',
         ];

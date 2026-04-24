@@ -201,4 +201,17 @@ class CampaignRecipientsRepository implements CampaignRecipientsRepositoryInterf
       ->where('status', $fromStatus)
       ->update(['status' => $toStatus]);
   }
+
+  /**
+   * Delete campaign recipient by campaign id and subscriber id.
+   * @param int $campaignId
+   * @param int $subscriberId
+   * @return int
+   */
+  public function deleteByCampaignIdAndSubscriberId(int $campaignId, int $subscriberId): int
+  {
+    return CampaignRecipient::where('campaign_id', $campaignId)
+      ->where('subscriber_id', $subscriberId)
+      ->delete();
+  }
 }

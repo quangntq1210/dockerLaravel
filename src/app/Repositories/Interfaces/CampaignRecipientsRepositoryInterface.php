@@ -103,4 +103,12 @@ interface CampaignRecipientsRepositoryInterface
    * @return int
    */
   public function updateStatusByCampaignIdAndSubscriberIds(int $campaignId, array $subscriberIds, string $fromStatus, string $toStatus) : int;
+
+  /**
+   * Delete campaign recipient by campaign id and subscriber id.
+   * @param int $campaignId
+   * @param int $subscriberId
+   * @return int
+   */
+  public function deleteByCampaignIdAndSubscriberId(int $campaignId, int $subscriberId): int;
 }

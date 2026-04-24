@@ -16,6 +16,7 @@ class NotificationRepository implements NotificationRepositoryInterface
     public function getUserNotifications($userId, $perPage = 20, $page = 1, bool $unreadOnly = false)
     {
         return Notification::where('user_id', $userId)
+            ->with(['campaign:id,title,body'])
             ->when($unreadOnly, fn($q) => $q->whereNull('read_at'))
             ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);

@@ -122,6 +122,8 @@
         };
 
         $(document).ready(function() {
+            const shouldReloadAfterLangSwitch = @json(request()->is('admin/campaign-scheduling*'));
+
             $('#languageSwitcher').on('change', function() {
                 const locale = $(this).val();
 
@@ -133,6 +135,10 @@
                         _token: "{{ csrf_token() }}"
                     },
                     success: function(response) {
+                        if (shouldReloadAfterLangSwitch) {
+                            window.location.reload();
+                            return;
+                        }
 
                         CRM_Admin.currentLangData = response.lang;
 

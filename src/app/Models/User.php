@@ -24,7 +24,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role',
+        'name', 'email', 'password', 'role', 'avatar_url',
     ];
 
     /**
@@ -48,5 +48,19 @@ class User extends Authenticatable implements MustVerifyEmail
     public function subscriber()
     {
         return $this->hasOne(Subscriber::class, 'user_id', 'id');
+    }
+
+    public function getAvatarDisplayUrlAttribute()
+    {
+        if (empty($this->avatar_url)) {
+            return null;
+        }
+
+        $url = (string) $this->avatar_url;
+        if (preg_match('/[?&]id=([A-Za-z0-9_-]+)/', $url, $matches)) {
+            return 'https://drive.google.com/thumbnail?id=' . $matches[1] . '&sz=w512';
+        }
+
+        return $url;
     }
 }

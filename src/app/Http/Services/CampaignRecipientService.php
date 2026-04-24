@@ -44,4 +44,20 @@ class CampaignRecipientService
 
         return $this->campaignRecipientsRepo->createCampaignRecipientsBulk($subscriberId, $campaigns);
     }
+
+    /**
+     * Unsubscribe current user from campaign.
+     * @param int $userId
+     * @param int $campaignId
+     * @return int
+     */
+    public function unsubscribeFromCampaign(int $userId, int $campaignId): int
+    {
+        $subscriber = $this->subscriberRepo->getByUserId($userId);
+        if (!$subscriber) {
+            return 0;
+        }
+
+        return $this->campaignRecipientsRepo->deleteByCampaignIdAndSubscriberId($campaignId, (int) $subscriber->id);
+    }
 }

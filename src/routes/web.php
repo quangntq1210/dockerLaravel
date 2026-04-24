@@ -15,6 +15,7 @@ use App\Http\Controllers\ManagerUserController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
 
 
 /*
@@ -25,6 +26,7 @@ use App\Http\Controllers\AuthController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::post('/subscribe', [HomeController::class, 'store'])->name('home.store');
+Route::delete('/subscribe', [HomeController::class, 'destroy'])->name('home.destroy');
 
 
 Route::put('/locale', [LocaleController::class, 'update'])->name('locale.update');
@@ -101,8 +103,16 @@ Route::middleware(['auth', 'role:user'])->group(function () {
         ->name('campaigns.draft');
     Route::post('/campaigns-recipients', [CampaignRecipientController::class, 'storeBulk'])
         ->name('campaigns.recipients.store.bulk');
+    Route::delete('/campaigns-recipients/{campaignId}', [CampaignRecipientController::class, 'destroy'])
+        ->name('campaigns.recipients.destroy');
     Route::get('/notifications', [NotificationController::class, 'index'])
         ->name('notifications.index');
+    Route::get('/profile', [ProfileController::class, 'index'])
+        ->name('profile.index');
+    Route::put('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])
+        ->name('profile.password.update');
 
     Route::prefix('api/user')->group(function () {
         Route::get('/notifications', [NotificationController::class, 'list'])->name('api.user.notifications.list');

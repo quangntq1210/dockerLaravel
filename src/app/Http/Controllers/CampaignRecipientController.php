@@ -107,10 +107,22 @@ class CampaignRecipientController extends ApiController
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy($id)
     {
-        //
+        $userId = auth()->id();
+
+        try {
+            $deleted = $this->campaignRecipientService->unsubscribeFromCampaign((int) $userId, (int) $id);
+
+            if ($deleted === 0) {
+                return $this->error(__('message.error_occurred'), 404);
+            }
+
+            return $this->success(__('message.unsubscribe_success'), null, null, 200);
+        } catch (\Throwable $th) {
+            return $this->error($th->getMessage(), 500);
+        }
     }
 }

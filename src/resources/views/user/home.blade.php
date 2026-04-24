@@ -1,411 +1,307 @@
-<!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ __('message.subscribe_title') }}</title>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-dark: #3730a3;
-            --primary-light: #e0e7ff;
-        }
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            font-family: 'Nunito', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem 1rem;
-        }
-        .subscribe-card {
-            background: #fff;
-            border-radius: 1.5rem;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 600px;
-            overflow: hidden;
-        }
-        .card-header-custom {
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            padding: 2.5rem 2.5rem 2rem;
-            color: #fff;
-        }
-        .card-header-custom .icon-wrap {
-            width: 56px;
-            height: 56px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.6rem;
-            margin-bottom: 1rem;
-        }
-        .card-header-custom h1 {
-            font-size: 1.6rem;
-            font-weight: 800;
-            margin: 0 0 .4rem;
-        }
-        .card-header-custom p {
-            opacity: .85;
-            margin: 0;
-            font-size: .95rem;
-            line-height: 1.5;
-        }
-        .card-body-custom {
-            padding: 2rem 2.5rem 2.5rem;
-        }
-        .form-label-custom {
-            font-weight: 700;
-            font-size: .85rem;
-            text-transform: uppercase;
-            letter-spacing: .05em;
-            color: #374151;
-            margin-bottom: .4rem;
-        }
-        .input-icon-wrap {
-            position: relative;
-        }
-        .input-icon-wrap .bi {
-            position: absolute;
-            left: .9rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #9ca3af;
-            font-size: 1rem;
-            pointer-events: none;
-        }
-        .input-icon-wrap .form-control {
-            padding-left: 2.4rem;
-        }
-        .form-control {
-            border: 1.5px solid #e5e7eb;
-            border-radius: .75rem;
-            padding: .7rem 1rem;
-            font-size: .95rem;
-            transition: border-color .2s, box-shadow .2s;
-        }
-        .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79,70,229,.12);
-        }
-        .campaign-list {
-            border: 1.5px solid #e5e7eb;
-            border-radius: .75rem;
-            max-height: 260px;
-            overflow-y: auto;
-            padding: .5rem 0;
-            background: #fafafa;
-        }
-        .campaign-list:focus-within {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79,70,229,.12);
-        }
-        .campaign-item {
-            display: flex;
-            align-items: flex-start;
-            gap: .8rem;
-            padding: .7rem 1rem;
-            cursor: pointer;
-            transition: background .15s;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        .campaign-item:last-child {
-            border-bottom: none;
-        }
-        .campaign-item:hover {
-            background: #f0f4ff;
-        }
-        .campaign-item input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            border-radius: .35rem;
-            border: 2px solid #d1d5db;
-            accent-color: var(--primary);
-            flex-shrink: 0;
-            margin-top: 2px;
-            cursor: pointer;
-        }
-        .campaign-item input:checked ~ .campaign-text .campaign-title {
-            color: var(--primary);
-        }
-        .campaign-title {
-            font-weight: 600;
-            font-size: .9rem;
-            color: #111827;
-            transition: color .15s;
-        }
-        .campaign-body-text {
-            font-size: .8rem;
-            color: #6b7280;
-            margin-top: .1rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 1;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .campaign-search {
-            border: none;
-            border-bottom: 1.5px solid #e5e7eb;
-            border-radius: 0;
-            background: #fff;
-            padding: .6rem 1rem .6rem 2.4rem;
-            font-size: .9rem;
-        }
-        .campaign-search:focus {
-            border-color: var(--primary);
-            box-shadow: none;
-            background: #fff;
-        }
-        .selected-count-badge {
-            background: var(--primary-light);
-            color: var(--primary);
-            font-size: .78rem;
-            font-weight: 700;
-            padding: .15rem .55rem;
-            border-radius: 999px;
-        }
-        .btn-subscribe {
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            color: #fff;
-            border: none;
-            border-radius: .75rem;
-            padding: .8rem 1.5rem;
-            font-size: 1rem;
-            font-weight: 700;
-            width: 100%;
-            transition: opacity .2s, transform .15s;
-            letter-spacing: .02em;
-        }
-        .btn-subscribe:hover:not(:disabled) {
-            opacity: .93;
-            transform: translateY(-1px);
-        }
-        .btn-subscribe:disabled {
-            opacity: .7;
-            cursor: not-allowed;
-        }
-        .toast-wrap {
-            position: fixed;
-            top: 1.2rem;
-            right: 1.2rem;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: .5rem;
-        }
-        .divider {
-            border: none;
-            border-top: 1.5px solid #f3f4f6;
-            margin: 1.5rem 0;
-        }
-        @media (max-width: 480px) {
-            .card-header-custom, .card-body-custom { padding-left: 1.3rem; padding-right: 1.3rem; }
-        }
-    </style>
-</head>
-<body>
+@extends('user.layouts.user')
 
-{{-- Toast container --}}
-<div class="toast-wrap" id="toast-container"></div>
+@section('content')
+    @php
+        $subscribedMap = collect($subscribedCampaignIds ?? [])->flip();
+    @endphp
 
-<div class="subscribe-card">
-    {{-- Header --}}
-    <div class="card-header-custom">
-        <div class="icon-wrap"><i class="bi bi-megaphone-fill"></i></div>
-        <h1>{{ __('message.subscribe_title') }}</h1>
-        <p>{{ __('message.subscribe_subtitle') }}</p>
-    </div>
-
-    {{-- Body --}}
-    <div class="card-body-custom">
-        <form id="subscribe-form" novalidate>
-            @csrf
-
-            {{-- Name --}}
-            <div class="mb-4">
-                <label class="form-label-custom">{{ __('message.your_name') }}</label>
-                <div class="input-icon-wrap">
-                    <i class="bi bi-person"></i>
-                    <input type="text" id="name" name="name" class="form-control"
-                        placeholder="{{ __('message.your_name') }}" required>
-                </div>
-                <div class="invalid-feedback d-block" id="err-name"></div>
-            </div>
-
-            {{-- Email --}}
-            <div class="mb-4">
-                <label class="form-label-custom">{{ __('message.your_email') }}</label>
-                <div class="input-icon-wrap">
-                    <i class="bi bi-envelope"></i>
-                    <input type="email" id="email" name="email" class="form-control"
-                        placeholder="{{ __('message.your_email') }}" required>
-                </div>
-                <div class="invalid-feedback d-block" id="err-email"></div>
-            </div>
-
-            <hr class="divider">
-
-            {{-- Campaigns --}}
-            <div class="mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label class="form-label-custom mb-0">{{ __('message.select_campaigns') }}</label>
-                    <span class="selected-count-badge" id="selected-count">0 {{ __('message.selected') }}</span>
-                </div>
-                <p class="text-muted mb-2" style="font-size:.82rem">
-                    <i class="bi bi-info-circle me-1"></i>{{ __('message.select_campaigns_hint') }}
-                </p>
-
-                @if($campaigns->isEmpty())
-                    <div class="text-center text-muted py-4">
-                        <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-                        {{ __('message.no_campaigns_available') }}
-                    </div>
+    <div class="home-campaign-page">
+        <div class="home-campaign-header">
+            <h1 class="home-campaign-title">{{ __('message.campaigns') }}</h1>
+            <p class="home-campaign-subtitle">
+                @auth
+                    {{ __('message.select_campaigns_hint') }}
                 @else
-                    <div class="campaign-list">
-                        {{-- Search --}}
-                        <div class="input-icon-wrap">
-                            <i class="bi bi-search" style="top:50%; z-index:1"></i>
-                            <input type="text" id="campaign-search" class="form-control campaign-search"
-                                placeholder="{{ __('message.search') }}...">
-                        </div>
-                        {{-- List --}}
-                        <div id="campaign-items">
-                            @foreach($campaigns->items() as $campaign)
-                            <label class="campaign-item" id="campaign-wrap-{{ $campaign->id }}">
-                                <input type="checkbox" name="campaign_ids[]" value="{{ $campaign->id }}"
-                                    class="campaign-checkbox">
-                                <div class="campaign-text">
-                                    <div class="campaign-title">{{ $campaign->title }}</div>
-                                    <div class="campaign-body-text">{{ $campaign->body }}</div>
+                    {{ __('message.enter_your_info_to_subscribe_unsubscribe_without_login') }}
+                @endauth
+            </p>
+        </div>
+
+        @if ($campaigns->isEmpty())
+            <div class="dashboard-card">
+                <div class="dashboard-card-body text-center py-5">
+                    <i class="bi bi-inbox fs-2 d-block mb-2 text-muted"></i>
+                    <span class="text-muted">{{ __('message.no_campaigns_available') }}</span>
+                </div>
+            </div>
+        @else
+            <div class="row g-4">
+                @foreach ($campaigns as $campaign)
+                    @php $isSubscribed = $subscribedMap->has($campaign->id); @endphp
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <article class="campaign-card campaign-detail-trigger" id="campaign-card-{{ $campaign->id }}"
+                            data-campaign-title="{{ $campaign->title }}" data-campaign-body="{{ $campaign->body }}"
+                            data-campaign-status="{{ $isSubscribed ? __('message.subscribed') : __('message.not_subscribed') }}">
+                            <div class="campaign-card-image-wrap">
+                                <div class="campaign-card-placeholder">
+                                    <i class="bi bi-image"></i>
                                 </div>
-                            </label>
-                            @endforeach
-                        </div>
+                            </div>
+
+                            <div class="campaign-card-body">
+                                <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                                    <h3 class="campaign-card-title mb-0">{{ $campaign->title }}</h3>
+                                    @auth
+                                        <span
+                                            class="badge campaign-status-badge {{ $isSubscribed ? 'campaign-status-subscribed' : 'campaign-status-unsubscribed' }}"
+                                            data-role="status">
+                                            {{ $isSubscribed ? __('message.subscribed') : __('message.not_subscribed') }}
+                                        </span>
+                                    @endauth
+                                </div>
+
+                                <p class="campaign-card-description">
+                                    {{ $campaign->body }}
+                                </p>
+
+                                @auth
+                                    <button type="button"
+                                        class="btn campaign-action-btn mt-auto {{ $isSubscribed ? 'btn-outline-secondary' : 'btn-primary' }}"
+                                        data-campaign-id="{{ $campaign->id }}"
+                                        data-subscribed="{{ $isSubscribed ? '1' : '0' }}">
+                                        <span class="campaign-action-label">
+                                            {{ $isSubscribed ? __('message.unsubscribe') : __('message.subscribe') }}
+                                        </span>
+                                    </button>
+                                @else
+                                    <button type="button"
+                                        class="btn btn-primary campaign-action-btn mt-auto guest-subscription-trigger"
+                                        data-campaign-id="{{ $campaign->id }}">
+                                        {{ __('message.subscribe') }} / {{ __('message.unsubscribe') }}
+                                    </button>
+                                @endauth
+                            </div>
+                        </article>
                     </div>
-                @endif
-                <div class="invalid-feedback d-block" id="err-campaigns"></div>
+                @endforeach
             </div>
 
-            {{-- Submit --}}
-            <button type="submit" class="btn-subscribe" id="btn-submit">
-                <span id="btn-text">
-                    <i class="bi bi-send me-2"></i>{{ __('message.subscribe_btn') }}
-                </span>
-                <span id="btn-loading" class="d-none">
-                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                    {{ __('message.subscribing') }}
-                </span>
-            </button>
-        </form>
-    </div>
-</div>
+            <div class="home-campaign-pagination mt-4">
+                {{ $campaigns->links() }}
+            </div>
 
-<script src="{{ asset('js/app.js') }}"></script>
-<script>
-$(function () {
-    // Campaign search filter
-    $('#campaign-search').on('input', function () {
-        const q = $(this).val().toLowerCase();
-        $('#campaign-items .campaign-item').each(function () {
-            const title = $(this).find('.campaign-title').text().toLowerCase();
-            $(this).toggle(title.includes(q));
-        });
-    });
-
-    // Selected count badge
-    $(document).on('change', '.campaign-checkbox', function () {
-        const count = $('.campaign-checkbox:checked').length;
-        $('#selected-count').text(count + ' {{ __("message.selected") }}');
-        if (count > 0) $('#err-campaigns').text('');
-    });
-
-    // Form submit
-    $('#subscribe-form').on('submit', function (e) {
-        e.preventDefault();
-        clearErrors();
-
-        const name = $('#name').val().trim();
-        const email = $('#email').val().trim();
-        const campaignIds = $('.campaign-checkbox:checked').map(function () {
-            return $(this).val();
-        }).get();
-
-        let valid = true;
-        if (!name) { showFieldError('err-name', '{{ __("validation.required", ["attribute" => __("message.your_name")]) }}'); valid = false; }
-        if (!email || !isValidEmail(email)) { showFieldError('err-email', '{{ __("validation.email", ["attribute" => __("message.your_email")]) }}'); valid = false; }
-        if (campaignIds.length === 0) { showFieldError('err-campaigns', '{{ __("message.please_select_at_least_one_campaign") }}'); valid = false; }
-        if (!valid) return;
-
-        setLoading(true);
-
-        $.ajax({
-            url: '{{ route("home.store") }}',
-            method: 'POST',
-            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-            data: { name, email, campaign_ids: campaignIds },
-            success: function (res) {
-                showToast(res.message, 'success');
-                $('#subscribe-form')[0].reset();
-                $('#selected-count').text('0 {{ __("message.selected") }}');
-            },
-            error: function (res) {
-                const errors = res?.responseJSON?.errors;
-                if (errors) {
-                    if (errors.name) showFieldError('err-name', errors.name[0]);
-                    if (errors.email) showFieldError('err-email', errors.email[0]);
-                    if (errors.campaign_ids) showFieldError('err-campaigns', errors.campaign_ids[0]);
-                } else {
-                    showToast(res?.responseJSON?.message || '{{ __("message.subscribe_error") }}', 'danger');
-                }
-            },
-            complete: function () { setLoading(false); }
-        });
-    });
-
-    function clearErrors() {
-        $('#err-name, #err-email, #err-campaigns').text('');
-    }
-
-    function showFieldError(id, msg) {
-        $('#' + id).text(msg);
-    }
-
-    function setLoading(on) {
-        $('#btn-submit').prop('disabled', on);
-        $('#btn-text').toggleClass('d-none', on);
-        $('#btn-loading').toggleClass('d-none', !on);
-    }
-
-    function isValidEmail(v) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-    }
-
-    function showToast(message, type) {
-        const id = 'toast-' + Date.now();
-        const icons = { success: 'bi-check-circle-fill', danger: 'bi-x-circle-fill', warning: 'bi-exclamation-circle-fill' };
-        const icon = icons[type] || 'bi-info-circle-fill';
-        const html = `
-            <div id="${id}" class="toast align-items-center text-white bg-${type} border-0 show mb-2"
-                 role="alert" style="min-width:280px; border-radius:.75rem; box-shadow:0 4px 20px rgba(0,0,0,.15)">
-                <div class="d-flex p-3 gap-2 align-items-center">
-                    <i class="bi ${icon} fs-5 flex-shrink-0"></i>
-                    <div class="flex-grow-1" style="font-size:.9rem">${message}</div>
-                    <button type="button" class="btn-close btn-close-white flex-shrink-0" data-bs-dismiss="toast"></button>
+            @guest
+                <div class="modal fade" id="guestSubscribeModal" tabindex="-1" aria-labelledby="guestSubscribeModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content campaign-detail-modal-content">
+                            <form id="guest-subscribe-form" novalidate>
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="guestSubscribeModalLabel">{{ __('message.subscribe') }} /
+                                        {{ __('message.unsubscribe') }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <input type="hidden" id="guest-campaign-id" name="campaign_id">
+                                    <div class="mb-3">
+                                        <label for="guest-name" class="form-label">{{ __('message.name') }}</label>
+                                        <input type="text" id="guest-name" name="name" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="guest-email" class="form-label">{{ __('message.email') }}</label>
+                                        <input type="email" id="guest-email" name="email" class="form-control" required>
+                                    </div>
+                                    <div class="mb-0">
+                                        <label for="guest-action" class="form-label">{{ __('message.action') }}</label>
+                                        <select id="guest-action" name="action" class="form-select">
+                                            <option value="subscribe">{{ __('message.subscribe') }}</option>
+                                            <option value="unsubscribe">{{ __('message.unsubscribe') }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-light"
+                                        data-bs-dismiss="modal">{{ __('message.close') }}</button>
+                                    <button type="submit" class="btn btn-primary">{{ __('message.submit') }}</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-            </div>`;
-        $('#toast-container').append(html);
-        const el = document.getElementById(id);
-        const t = new bootstrap.Toast(el, { delay: 4000, autohide: true });
-        t.show();
-        el.addEventListener('hidden.bs.toast', () => el.remove());
-    }
-});
-</script>
-</body>
-</html>
+            @endguest
+
+            <div class="modal fade" id="campaignDetailModal" tabindex="-1" aria-labelledby="campaignDetailModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content campaign-detail-modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="campaignDetailModalLabel"></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="mb-0" id="campaignDetailModalBody"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+    </div>
+@endsection
+
+@push('scripts')
+    @guest
+        <script>
+            $(function() {
+                const csrfToken = $('meta[name="csrf-token"]').attr('content');
+                const guestModalEl = document.getElementById('guestSubscribeModal');
+                const guestModal = guestModalEl ? new bootstrap.Modal(guestModalEl) : null;
+
+                function showActionToast(icon, text) {
+                    if (typeof Swal === 'undefined') return;
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: icon,
+                        title: text,
+                        showConfirmButton: false,
+                        timer: 2200,
+                        timerProgressBar: true
+                    });
+                }
+
+                $(document).on('click', '.guest-subscription-trigger', function() {
+                    $('#guest-campaign-id').val($(this).data('campaign-id'));
+                    if (guestModal) guestModal.show();
+                });
+
+                $('#guest-subscribe-form').on('submit', function(e) {
+                    e.preventDefault();
+                    const campaignId = $('#guest-campaign-id').val();
+                    const name = $('#guest-name').val().trim();
+                    const email = $('#guest-email').val().trim();
+                    const action = $('#guest-action').val();
+
+                    const method = action === 'unsubscribe' ? 'DELETE' : 'POST';
+                    const url = action === 'unsubscribe' ? @js(route('home.destroy')) :
+                        @js(route('home.store'));
+                    const payload = {
+                        name: name,
+                        email: email,
+                        campaign_ids: [campaignId]
+                    };
+
+                    $.ajax({
+                        url: url,
+                        method: method,
+                        data: {
+                            ...payload,
+                            _token: csrfToken
+                        },
+                        success: function(response) {
+                            if (guestModal) guestModal.hide();
+                            showActionToast('success', response?.message || (action ===
+                                'unsubscribe' ?
+                                'Unsubscribed successfully.' : 'Subscribed successfully.'));
+                        },
+                        error: function(xhr) {
+                            showActionToast('error', xhr?.responseJSON?.message ||
+                                @js(__('message.error_occurred')));
+                        }
+                    });
+                });
+            });
+        </script>
+    @endguest
+
+    @auth
+        <script>
+            $(function() {
+                const subscribeUrl = @js(route('campaigns.recipients.store.bulk'));
+                const unsubscribeUrlTemplate = @js(route('campaigns.recipients.destroy', ['campaignId' => '__ID__']));
+                const csrfToken = $('meta[name="csrf-token"]').attr('content');
+                const modalEl = document.getElementById('campaignDetailModal');
+                const modalInstance = modalEl ? new bootstrap.Modal(modalEl) : null;
+                const subscribeSuccessText = @js(__('message.subscribe_success'));
+                const unsubscribeSuccessText = @js(__('message.unsubscribe_success'));
+                const genericErrorText = @js(__('message.error_occurred'));
+
+                function showActionToast(icon, text) {
+                    if (typeof Swal === 'undefined') return;
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: icon,
+                        title: text,
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true
+                    });
+                }
+
+                $(document).on('click', '.campaign-detail-trigger', function(e) {
+                    if ($(e.target).closest('.campaign-action-btn, a, button').length) {
+                        return;
+                    }
+
+                    if (!modalInstance) {
+                        return;
+                    }
+
+                    const $card = $(this);
+                    $('#campaignDetailModalLabel').text($card.data('campaign-title') || '');
+                    $('#campaignDetailModalBody').text($card.data('campaign-body') || '');
+                    modalInstance.show();
+                });
+
+                $(document).on('click', '.campaign-action-btn[data-campaign-id]', function() {
+                    const $button = $(this);
+                    const campaignId = $button.data('campaign-id');
+                    const subscribed = String($button.data('subscribed')) === '1';
+                    const requestConfig = subscribed ? {
+                        url: unsubscribeUrlTemplate.replace('__ID__', campaignId),
+                        method: 'DELETE',
+                        data: {
+                            _token: csrfToken
+                        }
+                    } : {
+                        url: subscribeUrl,
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            campaigns: [campaignId]
+                        }),
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken
+                        }
+                    };
+
+                    $button.prop('disabled', true);
+
+                    $.ajax(requestConfig)
+                        .done(function(response) {
+                            const nowSubscribed = !subscribed;
+                            const $card = $('#campaign-card-' + campaignId);
+                            const $status = $card.find('[data-role="status"]');
+                            const $label = $button.find('.campaign-action-label');
+
+                            $button.data('subscribed', nowSubscribed ? '1' : '0');
+                            $button.toggleClass('btn-primary', !nowSubscribed);
+                            $button.toggleClass('btn-outline-secondary', nowSubscribed);
+
+                            $status
+                                .toggleClass('campaign-status-subscribed', nowSubscribed)
+                                .toggleClass('campaign-status-unsubscribed', !nowSubscribed)
+                                .text(nowSubscribed ? @js(__('message.subscribed')) :
+                                    @js(__('message.not_subscribed')));
+                            $card.attr('data-campaign-status', nowSubscribed ?
+                                @js(__('message.subscribed')) :
+                                @js(__('message.not_subscribed')));
+
+                            $label.text(nowSubscribed ? @js(__('message.unsubscribe')) :
+                                @js(__('message.subscribe')));
+                            showActionToast('success', response?.message || (nowSubscribed ?
+                                subscribeSuccessText :
+                                unsubscribeSuccessText));
+                        })
+                        .fail(function(xhr) {
+                            showActionToast('error', xhr?.responseJSON?.message || genericErrorText);
+                        })
+                        .always(function() {
+                            $button.prop('disabled', false);
+                        });
+                });
+            });
+        </script>
+    @endauth
+@endpush

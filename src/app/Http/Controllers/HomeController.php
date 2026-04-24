@@ -20,9 +20,15 @@ class HomeController extends ApiController
      */
     public function index(Request $request)
     {
-        $campaigns = $this->homeService->getCampaignsDraft(100, 1);
+        if (auth()->check()) {
+            $campaigns = $this->homeService->getCampaignsForAuth(12);
+            $subscribedCampaignIds = $this->homeService->getSubscribedCampaignIdsByUserId(auth()->id());
+        } else {
+            $campaigns = $this->homeService->getCampaignsDraft(12);
+            $subscribedCampaignIds = [];
+        }
 
-        return view('user.home', compact('campaigns'));
+        return view('user.home', compact('campaigns', 'subscribedCampaignIds'));
     }
 
     /**
@@ -38,6 +44,27 @@ class HomeController extends ApiController
             return $this->success(__('message.subscribe_success'), null, null, 201);
         } catch (\Throwable $th) {
             return $this->error(__('message.subscribe_failed'), 500);
+        }
+    }
+
+    /**
+     * Handle public unsubscribe form submission.
+     * @param HomeRequest $homeRequest
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy(HomeRequest $homeRequest)
+    {
+        $validated = $homeRequest->validated();
+
+        try {
+            $deleted = $this->homeService->deleteCampaignRecipients($validated);
+            if ($deleted === 0) {
+                return $this->error(__('message.error_occurred'), 404);
+            }
+
+            return $this->success(__('message.unsubscribe_success'), null, null, 200);
+        } catch (\Throwable $th) {
+            return $this->error(__('message.error_occurred'), 500);
         }
     }
 }
